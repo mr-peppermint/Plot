@@ -145,14 +145,11 @@ function Home() {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 1.2, delay: 0.5 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
               className="flex items-center justify-center gap-3 mb-5"
             >
               <FloralAccent />
-              <span
-                className="text-[10px] md:text-xs font-sans font-semibold tracking-[0.35em] uppercase"
-                style={{ color: 'rgba(201,168,76,0.8)' }}
-              >
+              <span className="text-[10px] md:text-xs font-sans font-semibold tracking-[0.35em] uppercase" style={{ color: '#C9A84C' }}>
                 A Royal Celebration
               </span>
               <FloralAccent flip />
@@ -160,18 +157,29 @@ function Home() {
 
             {/* Main title */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.88 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 1.6, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.9, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
             >
               <h1 className="font-serif font-bold tracking-tight leading-none mb-2">
                 <span
                   className="block text-6xl md:text-8xl lg:text-9xl"
-                  style={{ color: 'rgba(240,225,190,0.95)' }}
+                  style={{ color: '#F5EDD8', textShadow: '0 0 80px rgba(201,168,76,0.3), 0 2px 4px rgba(0,0,0,0.8)' }}
                 >
                   Happy
                 </span>
-                <span className="block text-7xl md:text-9xl lg:text-[10rem] text-gold-shimmer italic">
+                <span
+                  className="block text-7xl md:text-9xl lg:text-[10rem] italic"
+                  style={{
+                    background: 'linear-gradient(90deg, #8B6914 0%, #C9A84C 18%, #F5D98A 35%, #FFF3C0 50%, #F5D98A 65%, #C9A84C 82%, #8B6914 100%)',
+                    backgroundSize: '200% auto',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text',
+                    animation: 'gold-shimmer 4s linear infinite',
+                    filter: 'drop-shadow(0 2px 16px rgba(201,168,76,0.5))',
+                  }}
+                >
                   Birthday
                 </span>
               </h1>
@@ -181,9 +189,9 @@ function Home() {
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 1.2, delay: 1.6 }}
+              transition={{ duration: 0.8, delay: 0.9 }}
               className="font-sans text-sm md:text-base tracking-[0.18em] mt-8 max-w-sm mx-auto"
-              style={{ color: 'rgba(201,168,76,0.55)' }}
+              style={{ color: 'rgba(201,168,76,0.65)' }}
             >
               Every year tells a story — yours is one worth celebrating
             </motion.p>
@@ -217,10 +225,7 @@ function Home() {
           className="w-full py-10 px-4 text-center"
         >
           <RoyalDivider />
-          <p
-            className="text-xs md:text-sm tracking-[0.3em] uppercase font-sans my-4"
-            style={{ color: 'rgba(201,168,76,0.45)' }}
-          >
+          <p className="text-xs md:text-sm tracking-[0.3em] uppercase font-sans my-4 text-gold-muted">
             Scroll through the memories
           </p>
           <RoyalDivider />
@@ -296,7 +301,7 @@ function Home() {
 
             <h2
               className="text-4xl md:text-6xl lg:text-7xl font-serif italic mb-6 leading-tight"
-              style={{ color: 'rgba(240,225,190,0.92)' }}
+              style={{ color: '#F0E4C8', textShadow: '0 0 40px rgba(201,168,76,0.2)' }}
             >
               To Many More
             </h2>
@@ -304,17 +309,11 @@ function Home() {
             {/* Gold rule */}
             <div className="gold-line w-24 mx-auto mb-8" />
 
-            <p
-              className="text-base md:text-xl leading-relaxed mb-5 max-w-lg mx-auto font-sans"
-              style={{ color: 'rgba(201,168,76,0.6)' }}
-            >
+            <p className="text-base md:text-xl leading-relaxed mb-5 max-w-lg mx-auto font-sans text-gold-muted">
               May this year bring you boundless joy, unexpected adventures,
               and peace in the quiet moments in between.
             </p>
-            <p
-              className="text-sm md:text-base leading-relaxed mb-14 max-w-md mx-auto font-sans"
-              style={{ color: 'rgba(201,168,76,0.42)' }}
-            >
+            <p className="text-sm md:text-base leading-relaxed mb-14 max-w-md mx-auto font-sans text-parchment">
               You deserve every beautiful thing coming your way.
               The world is richer — and brighter — with you in it.
             </p>
@@ -327,7 +326,16 @@ function Home() {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 1.1, delay: 0.5, type: 'spring', stiffness: 100 }}
-              className="text-5xl md:text-7xl lg:text-8xl font-serif font-bold text-gold-shimmer mt-10"
+              className="text-5xl md:text-7xl lg:text-8xl font-serif font-bold mt-10"
+              style={{
+                background: 'linear-gradient(90deg, #8B6914 0%, #C9A84C 18%, #F5D98A 35%, #FFF3C0 50%, #F5D98A 65%, #C9A84C 82%, #8B6914 100%)',
+                backgroundSize: '200% auto',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                animation: 'gold-shimmer 4s linear infinite',
+                filter: 'drop-shadow(0 2px 16px rgba(201,168,76,0.5))',
+              }}
             >
               Happy Birthday!
             </motion.div>

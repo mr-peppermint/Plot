@@ -81,10 +81,7 @@ export function TimelineSector({ number, label, title, description, isEven }: Ti
             <svg width="16" height="16" viewBox="0 0 20 20" fill="rgba(201,168,76,0.5)">
               <path d="M10 0 L11.5 8.5 L20 10 L11.5 11.5 L10 20 L8.5 11.5 L0 10 L8.5 8.5 Z" />
             </svg>
-            <span
-              className="text-[10px] font-semibold tracking-[0.25em] uppercase font-sans"
-              style={{ color: 'rgba(201,168,76,0.7)' }}
-            >
+            <span className="text-[10px] font-semibold tracking-[0.25em] uppercase font-sans text-gold">
               {label} {String(number).padStart(2, '0')}
             </span>
             <svg width="16" height="16" viewBox="0 0 20 20" fill="rgba(201,168,76,0.5)">
@@ -93,10 +90,7 @@ export function TimelineSector({ number, label, title, description, isEven }: Ti
           </div>
 
           {/* Title */}
-          <h3
-            className="text-3xl md:text-4xl font-serif mb-4 leading-tight"
-            style={{ color: 'rgba(240,225,190,0.93)' }}
-          >
+          <h3 className="text-3xl md:text-4xl font-serif mb-4 leading-tight text-cream">
             {title}
           </h3>
 
@@ -107,7 +101,7 @@ export function TimelineSector({ number, label, title, description, isEven }: Ti
           />
 
           {/* Description */}
-          <p className="leading-relaxed max-w-xs text-sm md:text-base font-sans" style={{ color: 'rgba(201,168,76,0.48)' }}>
+          <p className="leading-relaxed max-w-xs text-sm md:text-base font-sans text-parchment">
             {description}
           </p>
         </div>
@@ -182,10 +176,7 @@ export function TimelineSector({ number, label, title, description, isEven }: Ti
               >
                 <ImageIcon className="w-6 h-6" style={{ color: 'rgba(201,168,76,0.5)' }} />
               </motion.div>
-              <span
-                className="text-xs font-sans tracking-widest uppercase"
-                style={{ color: 'rgba(201,168,76,0.35)' }}
-              >
+              <span className="text-xs font-sans tracking-widest uppercase text-gold-muted opacity-60">
                 Add your photo
               </span>
               <div className="flex gap-1.5 mt-0.5">
