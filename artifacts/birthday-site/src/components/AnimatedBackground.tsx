@@ -4,99 +4,71 @@ type Shape = {
   x: number;
   y: number;
   size: number;
-  type: 'circle' | 'star' | 'ribbon' | 'diamond' | 'heart' | 'sparkle';
+  type: 'circle' | 'star' | 'ribbon' | 'diamond' | 'sparkle' | 'ring';
   vx: number;
   vy: number;
   rotation: number;
   rotationSpeed: number;
   alpha: number;
   alphaSpeed: number;
-  color: string;
+  r: number; g: number; b: number;
   twinkleOffset: number;
+  layer: number;
 };
 
-function drawStar(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, points: number, rotation: number) {
-  const innerR = r * 0.45;
+function drawStar(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, points: number, rot: number) {
+  const inner = r * 0.4;
   ctx.beginPath();
   for (let i = 0; i < points * 2; i++) {
-    const angle = (i * Math.PI) / points + rotation;
-    const radius = i % 2 === 0 ? r : innerR;
-    if (i === 0) ctx.moveTo(x + radius * Math.cos(angle), y + radius * Math.sin(angle));
-    else ctx.lineTo(x + radius * Math.cos(angle), y + radius * Math.sin(angle));
+    const angle = (i * Math.PI) / points + rot - Math.PI / 2;
+    const radius = i % 2 === 0 ? r : inner;
+    i === 0
+      ? ctx.moveTo(x + radius * Math.cos(angle), y + radius * Math.sin(angle))
+      : ctx.lineTo(x + radius * Math.cos(angle), y + radius * Math.sin(angle));
   }
   ctx.closePath();
 }
 
-function drawDiamond(ctx: CanvasRenderingContext2D, x: number, y: number, size: number, rotation: number) {
+function drawDiamond(ctx: CanvasRenderingContext2D, x: number, y: number, size: number, rot: number) {
   ctx.save();
   ctx.translate(x, y);
-  ctx.rotate(rotation);
+  ctx.rotate(rot);
   ctx.beginPath();
   ctx.moveTo(0, -size);
-  ctx.lineTo(size * 0.6, 0);
+  ctx.lineTo(size * 0.55, 0);
   ctx.lineTo(0, size);
-  ctx.lineTo(-size * 0.6, 0);
+  ctx.lineTo(-size * 0.55, 0);
   ctx.closePath();
   ctx.restore();
 }
 
-function drawRibbon(ctx: CanvasRenderingContext2D, x: number, y: number, size: number, rotation: number) {
+function drawSparkle(ctx: CanvasRenderingContext2D, x: number, y: number, size: number, rot: number) {
   ctx.save();
   ctx.translate(x, y);
-  ctx.rotate(rotation);
-  ctx.beginPath();
-  ctx.rect(-size * 0.25, -size, size * 0.5, size * 2);
-  ctx.restore();
-}
-
-function drawSparkle(ctx: CanvasRenderingContext2D, x: number, y: number, size: number, rotation: number) {
-  ctx.save();
-  ctx.translate(x, y);
-  ctx.rotate(rotation);
+  ctx.rotate(rot);
   for (let i = 0; i < 4; i++) {
-    const angle = (i * Math.PI) / 2;
+    const a = (i * Math.PI) / 2;
     ctx.beginPath();
     ctx.moveTo(0, 0);
-    ctx.bezierCurveTo(
-      size * 0.2, size * 0.1,
-      size * 0.3, size * 0.3,
-      size * Math.cos(angle), size * Math.sin(angle)
-    );
-    ctx.bezierCurveTo(
-      size * 0.3, size * 0.3,
-      size * 0.2, size * 0.1,
-      0, 0
-    );
+    ctx.bezierCurveTo(size * 0.25, size * 0.1, size * 0.35, size * 0.35, size * Math.cos(a), size * Math.sin(a));
+    ctx.bezierCurveTo(size * 0.35, size * 0.35, size * 0.25, size * 0.1, 0, 0);
     ctx.closePath();
     ctx.fill();
   }
   ctx.restore();
 }
 
-function drawHeart(ctx: CanvasRenderingContext2D, x: number, y: number, size: number, rotation: number) {
-  ctx.save();
-  ctx.translate(x, y);
-  ctx.rotate(rotation);
-  ctx.scale(size / 30, size / 30);
-  ctx.beginPath();
-  ctx.moveTo(0, -10);
-  ctx.bezierCurveTo(0, -15, -15, -15, -15, -5);
-  ctx.bezierCurveTo(-15, 5, 0, 15, 0, 22);
-  ctx.bezierCurveTo(0, 15, 15, 5, 15, -5);
-  ctx.bezierCurveTo(15, -15, 0, -15, 0, -10);
-  ctx.closePath();
-  ctx.restore();
-}
-
-const PALETTE = [
-  [255, 215, 0],   // gold
-  [255, 182, 193], // pink
-  [216, 191, 216], // thistle
-  [255, 165, 100], // peach
-  [200, 162, 200], // violet
-  [255, 240, 180], // champagne
-  [252, 170, 200], // rose
-  [180, 200, 255], // periwinkle
+/* Royal jewel palette: gold, champagne, sapphire, amethyst, rose-gold, silver */
+const JEWELS: [number, number, number][] = [
+  [212, 175, 55],   // antique gold
+  [255, 215, 120],  // champagne gold
+  [245, 217, 138],  // pale gold
+  [100, 130, 220],  // royal sapphire
+  [140, 80, 210],   // amethyst
+  [180, 140, 220],  // pale amethyst
+  [210, 180, 255],  // lavender
+  [200, 165, 90],   // bronze-gold
+  [255, 255, 200],  // icy white-gold
 ];
 
 export function AnimatedBackground() {
@@ -111,25 +83,26 @@ export function AnimatedBackground() {
     let shapes: Shape[] = [];
     let animId: number;
     let time = 0;
-
-    const types: Shape['type'][] = ['circle', 'star', 'ribbon', 'diamond', 'heart', 'sparkle'];
+    const types: Shape['type'][] = ['circle', 'star', 'ribbon', 'diamond', 'sparkle', 'ring'];
 
     const makeShape = (overrideY?: number): Shape => {
-      const rgb = PALETTE[Math.floor(Math.random() * PALETTE.length)];
-      const type = types[Math.floor(Math.random() * types.length)];
+      const [r, g, b] = JEWELS[Math.floor(Math.random() * JEWELS.length)];
+      const layer = Math.floor(Math.random() * 3); // 0=far, 1=mid, 2=near
+      const speed = 0.15 + layer * 0.25;
       return {
         x: Math.random() * canvas.width,
         y: overrideY !== undefined ? overrideY : Math.random() * canvas.height,
-        size: Math.random() * 9 + 3,
-        type,
-        vx: (Math.random() - 0.5) * 0.6,
-        vy: -(Math.random() * 0.9 + 0.3),
+        size: (2 + Math.random() * 5) * (1 + layer * 0.5),
+        type: types[Math.floor(Math.random() * types.length)],
+        vx: (Math.random() - 0.5) * 0.35,
+        vy: -(speed + Math.random() * 0.4),
         rotation: Math.random() * Math.PI * 2,
-        rotationSpeed: (Math.random() - 0.5) * 0.04,
-        alpha: Math.random() * 0.6 + 0.2,
-        alphaSpeed: (Math.random() * 0.008 + 0.002) * (Math.random() < 0.5 ? 1 : -1),
-        color: `rgb(${rgb[0]},${rgb[1]},${rgb[2]})`,
+        rotationSpeed: (Math.random() - 0.5) * 0.03,
+        alpha: Math.random() * 0.5 + 0.15,
+        alphaSpeed: (0.003 + Math.random() * 0.006) * (Math.random() < 0.5 ? 1 : -1),
+        r, g, b,
         twinkleOffset: Math.random() * Math.PI * 2,
+        layer,
       };
     };
 
@@ -137,78 +110,42 @@ export function AnimatedBackground() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
       shapes = [];
-      const count = Math.min(Math.floor(window.innerWidth / 12), 110);
+      const count = Math.min(Math.floor(window.innerWidth / 10), 130);
       for (let i = 0; i < count; i++) shapes.push(makeShape());
     };
 
-    const drawShape = (s: Shape) => {
-      const twinkle = 0.55 + 0.45 * Math.sin(time * 0.04 + s.twinkleOffset);
-      const a = Math.max(0, Math.min(1, s.alpha * twinkle));
-      ctx.globalAlpha = a;
-      ctx.fillStyle = s.color;
-      ctx.strokeStyle = s.color;
-      ctx.lineWidth = 1.5;
+    /* ── Shooting stars ── */
+    const shots: { x: number; y: number; len: number; speed: number; angle: number; life: number; maxLife: number; r: number; g: number; b: number }[] = [];
 
-      switch (s.type) {
-        case 'circle':
-          ctx.beginPath();
-          ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
-          ctx.fill();
-          break;
-        case 'star':
-          drawStar(ctx, s.x, s.y, s.size, 5, s.rotation);
-          ctx.fill();
-          break;
-        case 'ribbon':
-          drawRibbon(ctx, s.x, s.y, s.size, s.rotation);
-          ctx.fill();
-          break;
-        case 'diamond':
-          drawDiamond(ctx, s.x, s.y, s.size, s.rotation);
-          ctx.fill();
-          break;
-        case 'heart':
-          drawHeart(ctx, s.x, s.y, s.size, s.rotation);
-          ctx.fill();
-          break;
-        case 'sparkle':
-          drawSparkle(ctx, s.x, s.y, s.size, s.rotation);
-          break;
-      }
-    };
-
-    const shootingStars: { x: number; y: number; len: number; speed: number; angle: number; alpha: number; life: number; maxLife: number }[] = [];
-
-    const spawnShootingStar = () => {
-      if (shootingStars.length < 3 && Math.random() < 0.005) {
-        shootingStars.push({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height * 0.4,
-          len: Math.random() * 120 + 60,
-          speed: Math.random() * 8 + 5,
-          angle: Math.PI / 5 + Math.random() * 0.3,
-          alpha: 0,
+    const spawnShot = () => {
+      if (shots.length < 4 && Math.random() < 0.007) {
+        const [r, g, b] = [[212,175,55],[100,130,220],[140,80,210]][Math.floor(Math.random()*3)];
+        shots.push({
+          x: Math.random() * canvas.width * 0.8,
+          y: Math.random() * canvas.height * 0.35,
+          len: 80 + Math.random() * 140,
+          speed: 6 + Math.random() * 7,
+          angle: Math.PI / 5.5 + Math.random() * 0.35,
           life: 0,
-          maxLife: 60 + Math.random() * 40,
+          maxLife: 50 + Math.random() * 50,
+          r, g, b,
         });
       }
     };
 
-    const drawShootingStars = () => {
-      for (let i = shootingStars.length - 1; i >= 0; i--) {
-        const s = shootingStars[i];
+    const drawShots = () => {
+      for (let i = shots.length - 1; i >= 0; i--) {
+        const s = shots[i];
         s.life++;
-        s.alpha = Math.sin((s.life / s.maxLife) * Math.PI);
+        const alpha = Math.sin((s.life / s.maxLife) * Math.PI) * 0.9;
         s.x += Math.cos(s.angle) * s.speed;
         s.y += Math.sin(s.angle) * s.speed;
 
-        const grad = ctx.createLinearGradient(
-          s.x, s.y,
-          s.x - Math.cos(s.angle) * s.len,
-          s.y - Math.sin(s.angle) * s.len
-        );
-        grad.addColorStop(0, `rgba(255,255,240,${s.alpha * 0.9})`);
-        grad.addColorStop(1, 'rgba(255,255,240,0)');
+        const head = `rgba(${s.r},${s.g},${s.b},${alpha})`;
+        const grad = ctx.createLinearGradient(s.x, s.y, s.x - Math.cos(s.angle) * s.len, s.y - Math.sin(s.angle) * s.len);
+        grad.addColorStop(0, head);
+        grad.addColorStop(0.3, `rgba(${s.r},${s.g},${s.b},${alpha * 0.4})`);
+        grad.addColorStop(1, `rgba(${s.r},${s.g},${s.b},0)`);
 
         ctx.save();
         ctx.globalAlpha = 1;
@@ -216,11 +153,96 @@ export function AnimatedBackground() {
         ctx.moveTo(s.x, s.y);
         ctx.lineTo(s.x - Math.cos(s.angle) * s.len, s.y - Math.sin(s.angle) * s.len);
         ctx.strokeStyle = grad;
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 1.5 + s.layer * 0;
         ctx.stroke();
+
+        /* Head glow */
+        const glow = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, 5);
+        glow.addColorStop(0, `rgba(${s.r},${s.g},${s.b},${alpha})`);
+        glow.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, 5, 0, Math.PI * 2);
+        ctx.fillStyle = glow;
+        ctx.fill();
         ctx.restore();
 
-        if (s.life >= s.maxLife) shootingStars.splice(i, 1);
+        if (s.life >= s.maxLife) shots.splice(i, 1);
+      }
+    };
+
+    /* ── Nebula blobs (slow, large, atmospheric) ── */
+    const nebula = [
+      { x: 0.25, y: 0.2, r: 300, r1: 80, g1: 30, b1: 150, speed: 0.0004 },
+      { x: 0.75, y: 0.6, r: 250, r1: 20, g1: 10, b1: 100, speed: 0.0003 },
+      { x: 0.5,  y: 0.85, r: 280, r1: 140, g1: 80, b1: 20, speed: 0.0005 },
+    ];
+
+    const drawNebula = () => {
+      nebula.forEach((n) => {
+        const cx = n.x * canvas.width + Math.sin(time * n.speed * 100) * 40;
+        const cy = n.y * canvas.height + Math.cos(time * n.speed * 80) * 30;
+        const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, n.r);
+        grad.addColorStop(0, `rgba(${n.r1},${n.g1},${n.b1},0.06)`);
+        grad.addColorStop(0.5, `rgba(${n.r1},${n.g1},${n.b1},0.03)`);
+        grad.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.save();
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(cx, cy, n.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+    };
+
+    const drawShape = (s: Shape) => {
+      const twinkle = 0.5 + 0.5 * Math.sin(time * 0.05 + s.twinkleOffset);
+      const a = Math.max(0, Math.min(1, s.alpha * twinkle));
+      ctx.globalAlpha = a;
+      ctx.fillStyle = `rgb(${s.r},${s.g},${s.b})`;
+
+      switch (s.type) {
+        case 'circle': {
+          /* Glowing orb */
+          const grad = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.size * 2);
+          grad.addColorStop(0, `rgba(${s.r},${s.g},${s.b},${a})`);
+          grad.addColorStop(0.5, `rgba(${s.r},${s.g},${s.b},${a * 0.3})`);
+          grad.addColorStop(1, `rgba(${s.r},${s.g},${s.b},0)`);
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.size * 2, 0, Math.PI * 2);
+          ctx.fill();
+          break;
+        }
+        case 'star':
+          ctx.fillStyle = `rgb(${s.r},${s.g},${s.b})`;
+          drawStar(ctx, s.x, s.y, s.size, 5, s.rotation);
+          ctx.fill();
+          break;
+        case 'ribbon':
+          ctx.save();
+          ctx.translate(s.x, s.y);
+          ctx.rotate(s.rotation);
+          ctx.fillStyle = `rgb(${s.r},${s.g},${s.b})`;
+          ctx.fillRect(-s.size * 0.22, -s.size, s.size * 0.44, s.size * 2);
+          ctx.restore();
+          break;
+        case 'diamond':
+          ctx.fillStyle = `rgb(${s.r},${s.g},${s.b})`;
+          drawDiamond(ctx, s.x, s.y, s.size, s.rotation);
+          ctx.fill();
+          break;
+        case 'sparkle':
+          ctx.fillStyle = `rgb(${s.r},${s.g},${s.b})`;
+          drawSparkle(ctx, s.x, s.y, s.size, s.rotation);
+          break;
+        case 'ring':
+          ctx.strokeStyle = `rgb(${s.r},${s.g},${s.b})`;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+          ctx.stroke();
+          break;
       }
     };
 
@@ -228,18 +250,18 @@ export function AnimatedBackground() {
       time++;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      spawnShootingStar();
-      drawShootingStars();
+      drawNebula();
+      spawnShot();
+      drawShots();
 
       shapes.forEach((s) => {
         s.x += s.vx;
         s.y += s.vy;
         s.rotation += s.rotationSpeed;
         s.alpha += s.alphaSpeed;
-        if (s.alpha > 0.85 || s.alpha < 0.1) s.alphaSpeed *= -1;
-
-        if (s.y < -20 || s.x < -20 || s.x > canvas.width + 20) {
-          Object.assign(s, makeShape(canvas.height + 10));
+        if (s.alpha > 0.75 || s.alpha < 0.08) s.alphaSpeed *= -1;
+        if (s.y < -20 || s.x < -30 || s.x > canvas.width + 30) {
+          Object.assign(s, makeShape(canvas.height + 15));
         }
         drawShape(s);
       });
@@ -262,7 +284,7 @@ export function AnimatedBackground() {
     <canvas
       ref={canvasRef}
       className="fixed inset-0 pointer-events-none z-0"
-      style={{ opacity: 0.65, mixBlendMode: 'screen' }}
+      style={{ opacity: 0.85 }}
     />
   );
 }
