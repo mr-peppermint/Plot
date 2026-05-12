@@ -163,16 +163,16 @@
   );
 }
 
-/* ── Gold shimmer text ── */
+/* ── Shimmer text utilities ── */
 .text-gold-shimmer {
   background: linear-gradient(
     90deg,
     #8B6914 0%,
-    #C9A84C 20%,
-    #F5D98A 40%,
-    #FFE9A0 50%,
-    #F5D98A 60%,
-    #C9A84C 80%,
+    #C9A84C 18%,
+    #F5D98A 35%,
+    #FFF3C0 50%,
+    #F5D98A 65%,
+    #C9A84C 82%,
     #8B6914 100%
   );
   background-size: 200% auto;
@@ -182,20 +182,38 @@
   animation: gold-shimmer 4s linear infinite;
 }
 
-.text-silver-shimmer {
+.text-champagne-shimmer {
   background: linear-gradient(
     90deg,
-    #6B7DB3 0%,
-    #A8B8E8 25%,
-    #D0DCF8 50%,
-    #A8B8E8 75%,
-    #6B7DB3 100%
+    #C4A882 0%,
+    #E8D5B0 20%,
+    #FFF8ED 40%,
+    #FFFAF4 50%,
+    #FFF8ED 60%,
+    #E8D5B0 80%,
+    #C4A882 100%
   );
   background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   animation: gold-shimmer 5s linear infinite;
+}
+
+.text-cream {
+  color: #F0E4C8;
+}
+
+.text-gold {
+  color: #C9A84C;
+}
+
+.text-gold-muted {
+  color: rgba(201, 168, 76, 0.6);
+}
+
+.text-parchment {
+  color: rgba(220, 195, 150, 0.72);
 }
 
 @keyframes gold-shimmer {
