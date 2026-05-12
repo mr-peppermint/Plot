@@ -13,13 +13,13 @@ const queryClient = new QueryClient();
 const CHAPTERS = [
   { label: "Chapter", title: "The Beginning", description: "Where the story started — a moment full of promise and the quiet excitement of what was yet to come." },
   { label: "Memory", title: "A Golden Moment", description: "The kind of day that feels painted in sunlight. Laughter echoing, the air carrying warmth." },
-  { label: "Year", title: "First Milestones", description: "Taking those brave first steps. The world seemed impossibly big, but you were ready." },
+  { label: "Year", title: "First Milestones", description: "Taking those brave first steps. The world seemed impossibly big, but you were ready for it." },
   { label: "Chapter", title: "Shared Smiles", description: "Surrounded by loved ones. A simple gathering that turned into an unforgettable memory." },
   { label: "Memory", title: "Unexpected Adventures", description: "Taking a wrong turn and finding the right place. Spontaneity at its absolute finest." },
   { label: "Year", title: "Growing Wings", description: "Learning to fly — the challenges faced only made the triumphs that much sweeter." },
   { label: "Chapter", title: "Quiet Reflection", description: "A peaceful afternoon. Finding comfort in silence and clarity in the calm." },
   { label: "Memory", title: "Wild Laughter", description: "Tears streaming down from laughing too hard. Pure, unadulterated joy in every breath." },
-  { label: "Year", title: "New Horizons", description: "Looking out at an unfamiliar view. The fear of the unknown replaced by undeniable excitement." },
+  { label: "Year", title: "New Horizons", description: "Looking out at an unfamiliar view. Fear of the unknown replaced by undeniable excitement." },
   { label: "Chapter", title: "Warm Embraces", description: "A hug that felt like coming home — knowing exactly where you belonged in this world." },
   { label: "Memory", title: "Dancing in the Rain", description: "Refusing to wait for the storm to pass. Embracing the beautiful, glorious mess of life." },
   { label: "Year", title: "Deep Conversations", description: "Talking until dawn. Words that shifted perspectives and deepened bonds forever." },
@@ -27,22 +27,42 @@ const CHAPTERS = [
   { label: "Memory", title: "A Spark of Genius", description: "That one 'aha' moment — when everything clicked and suddenly the path was crystal clear." },
   { label: "Year", title: "Finding Strength", description: "Realizing you were tougher than you ever imagined. A quiet resilience taking root." },
   { label: "Chapter", title: "Celebrating Wins", description: "Raising a glass to hard work paying off. Basking in the glow of hard-earned accomplishment." },
-  { label: "Memory", title: "A Perfect Melody", description: "A song playing at precisely the right moment — music that became forever intertwined with a memory." },
+  { label: "Memory", title: "A Perfect Melody", description: "A song playing at precisely the right moment — music forever intertwined with a memory." },
   { label: "Year", title: "The Present Joy", description: "Here and now. Looking back with gratitude and forward with nothing but brilliant, shining hope." },
 ];
 
-function OrnateDivider() {
+function CrownIcon() {
   return (
-    <div className="flex items-center justify-center gap-4 my-8">
-      <div className="h-px w-24 bg-gradient-to-r from-transparent to-primary/40" />
-      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" className="text-primary/60">
-        <path d="M14 0 L15.8 12.2 L28 14 L15.8 15.8 L14 28 L12.2 15.8 L0 14 L12.2 12.2 Z" fill="currentColor" />
-        <circle cx="14" cy="14" r="3" fill="white" fillOpacity="0.6" />
+    <svg width="36" height="28" viewBox="0 0 36 28" fill="none" className="text-primary">
+      <path
+        d="M3 24 L6 8 L12 16 L18 4 L24 16 L30 8 L33 24 Z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        fill="none"
+        strokeLinejoin="round"
+      />
+      <path d="M1 24 L35 24" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <circle cx="3" cy="8" r="2" fill="currentColor" />
+      <circle cx="18" cy="4" r="2" fill="currentColor" />
+      <circle cx="33" cy="8" r="2" fill="currentColor" />
+    </svg>
+  );
+}
+
+function RoyalDivider() {
+  return (
+    <div className="flex items-center justify-center gap-3 my-6">
+      <div className="gold-line flex-1 max-w-[80px]" />
+      <svg width="10" height="10" viewBox="0 0 10 10" className="text-primary/60" fill="currentColor">
+        <polygon points="5,0 6.2,3.8 10,5 6.2,6.2 5,10 3.8,6.2 0,5 3.8,3.8" />
       </svg>
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="text-secondary/60">
-        <path d="M7 0 L8.2 5.8 L14 7 L8.2 8.2 L7 14 L5.8 8.2 L0 7 L5.8 5.8 Z" fill="currentColor" />
+      <svg width="18" height="18" viewBox="0 0 20 20" className="text-primary" fill="currentColor">
+        <path d="M10 0 L11.8 8.2 L20 10 L11.8 11.8 L10 20 L8.2 11.8 L0 10 L8.2 8.2 Z" />
       </svg>
-      <div className="h-px w-24 bg-gradient-to-l from-transparent to-primary/40" />
+      <svg width="10" height="10" viewBox="0 0 10 10" className="text-primary/60" fill="currentColor">
+        <polygon points="5,0 6.2,3.8 10,5 6.2,6.2 5,10 3.8,6.2 0,5 3.8,3.8" />
+      </svg>
+      <div className="gold-line flex-1 max-w-[80px]" />
     </div>
   );
 }
@@ -50,124 +70,173 @@ function OrnateDivider() {
 function FloralAccent({ flip = false }: { flip?: boolean }) {
   return (
     <svg
-      width="120"
-      height="60"
-      viewBox="0 0 120 60"
+      width="100"
+      height="50"
+      viewBox="0 0 100 50"
       fill="none"
-      className={`text-primary/20 ${flip ? 'scale-x-[-1]' : ''}`}
+      className={`text-primary/35 ${flip ? 'scale-x-[-1]' : ''}`}
     >
-      <path d="M10 50 Q 30 10, 60 30 Q 90 50, 110 10" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" />
-      <circle cx="10" cy="50" r="4" fill="currentColor" />
-      <circle cx="60" cy="30" r="3" fill="currentColor" opacity="0.6" />
-      <circle cx="110" cy="10" r="4" fill="currentColor" />
-      <path d="M35 25 Q 38 15 45 22" stroke="currentColor" strokeWidth="1" fill="none" />
-      <path d="M75 40 Q 82 30 85 38" stroke="currentColor" strokeWidth="1" fill="none" />
+      <path d="M5 42 Q 25 8, 50 26 Q 75 44, 95 8" stroke="currentColor" strokeWidth="1" fill="none" strokeLinecap="round" />
+      <circle cx="5" cy="42" r="2.5" fill="currentColor" />
+      <circle cx="50" cy="26" r="2" fill="currentColor" opacity="0.7" />
+      <circle cx="95" cy="8" r="2.5" fill="currentColor" />
+      <path d="M28 20 Q 31 10 38 18" stroke="currentColor" strokeWidth="0.8" fill="none" />
+      <circle cx="33" cy="13" r="1.5" fill="currentColor" opacity="0.5" />
+      <path d="M62 35 Q 68 25 72 33" stroke="currentColor" strokeWidth="0.8" fill="none" />
+      <circle cx="67" cy="28" r="1.5" fill="currentColor" opacity="0.5" />
     </svg>
   );
 }
 
 function Home() {
   const { scrollYProgress } = useScroll();
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.15], [1, 0]);
-  const heroY = useTransform(scrollYProgress, [0, 0.15], [0, -40]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.18], [1, 0]);
+  const heroY = useTransform(scrollYProgress, [0, 0.18], [0, -50]);
 
   return (
     <div className="relative min-h-screen w-full bg-gradient-dynamic overflow-hidden">
       <AnimatedBackground />
 
-      {/* Noise texture overlay */}
-      <div className="fixed inset-0 z-0 pointer-events-none opacity-[0.025] mix-blend-overlay"
-        style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")" }}
+      {/* Fine noise grain */}
+      <div
+        className="fixed inset-0 z-0 pointer-events-none opacity-[0.018]"
+        style={{
+          backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
+        }}
       />
 
       <main className="relative z-10 flex flex-col items-center">
 
         {/* ── HERO ── */}
         <section className="w-full min-h-[100dvh] flex flex-col items-center justify-center p-4 text-center relative">
-          <Sparkles count={20} colors={['#FFD700', '#FFB6C1', '#D8BFD8', '#FFA07A', '#C8A2C8']} className="z-0" />
+          <Sparkles count={22} colors={['#D4AF37', '#F5D98A', '#A080D8', '#6482DC', '#E8D5A3']} className="z-0" />
 
-          {/* Decorative ring */}
+          {/* Rotating royal rings */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="w-[min(70vw,500px)] h-[min(70vw,500px)] rounded-full border border-primary/10 animate-spin-slow" />
-            <div className="absolute w-[min(55vw,380px)] h-[min(55vw,380px)] rounded-full border border-secondary/10 animate-spin-reverse-slow" />
+            <div
+              className="w-[min(65vw,480px)] h-[min(65vw,480px)] rounded-full animate-spin-slow"
+              style={{ border: '1px solid rgba(201,168,76,0.12)' }}
+            />
+            <div
+              className="absolute w-[min(50vw,360px)] h-[min(50vw,360px)] rounded-full animate-spin-reverse-slow"
+              style={{ border: '1px solid rgba(114,50,160,0.15)' }}
+            />
+            <div
+              className="absolute w-[min(38vw,270px)] h-[min(38vw,270px)] rounded-full animate-spin-slow"
+              style={{ border: '1px dashed rgba(201,168,76,0.08)', animationDuration: '50s' }}
+            />
           </div>
 
           <motion.div
             style={{ opacity: heroOpacity, y: heroY }}
             className="relative z-10 max-w-4xl"
           >
+            {/* Crown */}
             <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.2, delay: 0.3 }}
-              className="flex items-center justify-center gap-3 mb-6"
+              initial={{ opacity: 0, y: -16, scale: 0.8 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 1.2, delay: 0.2, type: 'spring', stiffness: 120 }}
+              className="flex justify-center mb-6"
+            >
+              <CrownIcon />
+            </motion.div>
+
+            {/* Tagline with floral accents */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 1.2, delay: 0.5 }}
+              className="flex items-center justify-center gap-3 mb-5"
             >
               <FloralAccent />
-              <span className="text-xs md:text-sm font-sans font-semibold tracking-[0.3em] text-primary uppercase">
-                A Celebration of You
+              <span
+                className="text-[10px] md:text-xs font-sans font-semibold tracking-[0.35em] uppercase"
+                style={{ color: 'rgba(201,168,76,0.8)' }}
+              >
+                A Royal Celebration
               </span>
               <FloralAccent flip />
             </motion.div>
 
-            <motion.h1
-              initial={{ opacity: 0, scale: 0.9 }}
+            {/* Main title */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.88 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 1.5, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              className="text-7xl md:text-9xl lg:text-[10rem] font-serif font-bold tracking-tight leading-none mb-4"
+              transition={{ duration: 1.6, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
             >
-              <span className="text-foreground/90">Happy</span>
-              <br />
-              <span className="italic text-primary">Birthday</span>
-            </motion.h1>
+              <h1 className="font-serif font-bold tracking-tight leading-none mb-2">
+                <span
+                  className="block text-6xl md:text-8xl lg:text-9xl"
+                  style={{ color: 'rgba(240,225,190,0.95)' }}
+                >
+                  Happy
+                </span>
+                <span className="block text-7xl md:text-9xl lg:text-[10rem] text-gold-shimmer italic">
+                  Birthday
+                </span>
+              </h1>
+            </motion.div>
 
+            {/* Sub text */}
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 1.2, delay: 1.4 }}
-              className="text-muted-foreground font-sans text-base md:text-lg tracking-wide max-w-md mx-auto mt-6"
+              transition={{ duration: 1.2, delay: 1.6 }}
+              className="font-sans text-sm md:text-base tracking-[0.18em] mt-8 max-w-sm mx-auto"
+              style={{ color: 'rgba(201,168,76,0.55)' }}
             >
-              Every year tells a story. Yours is one worth celebrating.
+              Every year tells a story — yours is one worth celebrating
             </motion.p>
 
+            {/* Scroll indicator */}
             <motion.div
-              initial={{ scaleY: 0, opacity: 0 }}
-              animate={{ scaleY: 1, opacity: 1 }}
-              transition={{ duration: 1.5, delay: 2 }}
-              className="origin-top w-px h-20 bg-gradient-to-b from-primary/60 to-transparent mx-auto mt-12"
+              initial={{ opacity: 0, scaleY: 0 }}
+              animate={{ opacity: 1, scaleY: 1 }}
+              transition={{ duration: 1.4, delay: 2.2 }}
+              className="origin-top mx-auto mt-14"
+              style={{ width: 1, height: 80, background: 'linear-gradient(to bottom, rgba(201,168,76,0.6), transparent)' }}
             />
             <motion.div
-              initial={{ opacity: 0, y: -4 }}
-              animate={{ opacity: [0, 1, 0], y: [0, 8, 0] }}
-              transition={{ duration: 2, delay: 2.5, repeat: Infinity }}
-              className="mx-auto mt-1"
+              animate={{ opacity: [0, 0.8, 0], y: [0, 8, 0] }}
+              transition={{ duration: 2, delay: 2.6, repeat: Infinity }}
+              className="mx-auto mt-1 flex justify-center"
             >
-              <svg width="16" height="16" viewBox="0 0 16 16" className="text-primary/50 mx-auto" fill="currentColor">
-                <path d="M8 12 L2 5 L3.4 3.6 L8 9.2 L12.6 3.6 L14 5 Z" />
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style={{ color: 'rgba(201,168,76,0.5)' }}>
+                <path d="M8 12 L2 5 L3.4 3.6 L8 9.2 L12.6 3.6 L14 5 Z" fill="currentColor" />
               </svg>
             </motion.div>
           </motion.div>
         </section>
 
-        {/* ── INTRO BANNER ── */}
+        {/* ── INTRO BAND ── */}
         <motion.section
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 1 }}
-          className="w-full py-12 px-4 text-center relative"
+          className="w-full py-10 px-4 text-center"
         >
-          <OrnateDivider />
-          <p className="text-muted-foreground text-sm md:text-base tracking-[0.15em] uppercase font-sans max-w-xl mx-auto">
+          <RoyalDivider />
+          <p
+            className="text-xs md:text-sm tracking-[0.3em] uppercase font-sans my-4"
+            style={{ color: 'rgba(201,168,76,0.45)' }}
+          >
             Scroll through the memories
           </p>
-          <OrnateDivider />
+          <RoyalDivider />
         </motion.section>
 
         {/* ── TIMELINE ── */}
-        <section className="w-full py-12 px-4 md:px-8 relative">
-          {/* Decorative side ribbons */}
-          <div className="hidden xl:block absolute left-4 top-0 bottom-0 w-0.5 bg-gradient-to-b from-transparent via-primary/15 to-transparent" />
-          <div className="hidden xl:block absolute right-4 top-0 bottom-0 w-0.5 bg-gradient-to-b from-transparent via-secondary/15 to-transparent" />
+        <section className="w-full py-10 px-4 md:px-8 relative">
+          {/* Side accent lines */}
+          <div
+            className="hidden xl:block absolute left-6 top-0 bottom-0 w-px"
+            style={{ background: 'linear-gradient(to bottom, transparent, rgba(201,168,76,0.12), transparent)' }}
+          />
+          <div
+            className="hidden xl:block absolute right-6 top-0 bottom-0 w-px"
+            style={{ background: 'linear-gradient(to bottom, transparent, rgba(114,50,160,0.12), transparent)' }}
+          />
 
           <div className="max-w-6xl mx-auto flex flex-col gap-4">
             {CHAPTERS.map((chapter, index) => (
@@ -183,68 +252,96 @@ function Home() {
           </div>
         </section>
 
-        {/* ── CLOSING SECTION ── */}
+        {/* ── CLOSING ── */}
         <section className="w-full min-h-[90dvh] flex flex-col items-center justify-center p-6 text-center relative overflow-hidden">
           <FloatingBalloons count={6} />
           <ConfettiBurst />
-          <Sparkles count={25} colors={['#FFD700', '#FF6B9D', '#9B59B6', '#3DBECC', '#FFA07A']} />
+          <Sparkles count={28} colors={['#D4AF37', '#F5D98A', '#A080D8', '#6482DC', '#C8A2C8', '#FFE9A0']} />
 
-          {/* Big glow behind */}
+          {/* Royal radial glow */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="w-[600px] h-[600px] rounded-full bg-primary/10 blur-3xl" />
+            <div
+              className="w-[700px] h-[700px] rounded-full"
+              style={{
+                background: 'radial-gradient(circle, rgba(201,168,76,0.07) 0%, rgba(114,50,160,0.05) 50%, transparent 70%)',
+              }}
+            />
           </div>
 
           <motion.div
-            initial={{ opacity: 0, scale: 0.88, y: 40 }}
+            initial={{ opacity: 0, scale: 0.85, y: 50 }}
             whileInView={{ opacity: 1, scale: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
             className="relative z-10 max-w-3xl"
           >
-            <div className="flex items-center justify-center gap-4 mb-10">
+            {/* Crown at top of closing */}
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.4, duration: 0.8 }}
+              className="flex justify-center mb-6"
+            >
+              <CrownIcon />
+            </motion.div>
+
+            <div className="flex items-center justify-center gap-4 mb-8">
               <FloralAccent />
-              <svg width="20" height="20" viewBox="0 0 20 20" className="text-primary/60" fill="currentColor">
+              <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor" className="text-primary">
                 <path d="M10 0 L11.5 8.5 L20 10 L11.5 11.5 L10 20 L8.5 11.5 L0 10 L8.5 8.5 Z" />
               </svg>
               <FloralAccent flip />
             </div>
 
-            <h2 className="text-4xl md:text-6xl lg:text-7xl font-serif italic text-foreground mb-6 leading-tight">
+            <h2
+              className="text-4xl md:text-6xl lg:text-7xl font-serif italic mb-6 leading-tight"
+              style={{ color: 'rgba(240,225,190,0.92)' }}
+            >
               To Many More
             </h2>
 
-            <div className="w-16 h-0.5 bg-gradient-to-r from-primary to-secondary mx-auto mb-8" />
+            {/* Gold rule */}
+            <div className="gold-line w-24 mx-auto mb-8" />
 
-            <p className="text-base md:text-xl text-muted-foreground leading-relaxed mb-6 max-w-lg mx-auto font-sans">
+            <p
+              className="text-base md:text-xl leading-relaxed mb-5 max-w-lg mx-auto font-sans"
+              style={{ color: 'rgba(201,168,76,0.6)' }}
+            >
               May this year bring you boundless joy, unexpected adventures,
-              and peace in the quiet moments.
+              and peace in the quiet moments in between.
             </p>
-            <p className="text-base md:text-lg text-muted-foreground leading-relaxed mb-12 max-w-md mx-auto font-sans">
+            <p
+              className="text-sm md:text-base leading-relaxed mb-14 max-w-md mx-auto font-sans"
+              style={{ color: 'rgba(201,168,76,0.42)' }}
+            >
               You deserve every beautiful thing coming your way.
-              Keep shining — the world is brighter with you in it.
+              The world is richer — and brighter — with you in it.
             </p>
 
-            <OrnateDivider />
+            <RoyalDivider />
 
+            {/* Final word */}
             <motion.div
               initial={{ opacity: 0, scale: 0.7 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              transition={{ duration: 1, delay: 0.4, type: 'spring', stiffness: 120 }}
-              className="text-5xl md:text-7xl lg:text-8xl font-serif font-bold text-primary mt-8 drop-shadow-lg"
+              transition={{ duration: 1.1, delay: 0.5, type: 'spring', stiffness: 100 }}
+              className="text-5xl md:text-7xl lg:text-8xl font-serif font-bold text-gold-shimmer mt-10"
             >
               Happy Birthday!
             </motion.div>
 
+            {/* Star row */}
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
-              transition={{ duration: 1.2, delay: 0.9 }}
-              className="mt-8 flex items-center justify-center gap-3"
+              transition={{ duration: 1.2, delay: 1 }}
+              className="mt-10 flex items-center justify-center gap-4"
             >
-              {[...Array(5)].map((_, i) => (
-                <svg key={i} width="16" height="16" viewBox="0 0 20 20" className="text-primary/50" fill="currentColor">
+              {[16, 10, 20, 10, 16].map((size, i) => (
+                <svg key={i} width={size} height={size} viewBox="0 0 20 20" fill="currentColor" className="text-primary" style={{ opacity: i === 2 ? 1 : 0.5 }}>
                   <path d="M10 0 L11.5 8.5 L20 10 L11.5 11.5 L10 20 L8.5 11.5 L0 10 L8.5 8.5 Z" />
                 </svg>
               ))}
