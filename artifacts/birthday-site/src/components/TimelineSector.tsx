@@ -18,14 +18,10 @@ function CornerBracket({ position }: { position: 'tl' | 'tr' | 'bl' | 'br' }) {
     br: 'bottom-0 right-0 scale-x-[-1] scale-y-[-1]',
   };
   return (
-    <svg
-      className={`absolute ${classes[position]} w-9 h-9 pointer-events-none`}
-      viewBox="0 0 36 36"
-      fill="none"
-    >
-      <path d="M2 34 L2 7 Q2 2 7 2 L34 2" stroke="rgba(201,168,76,0.45)" strokeWidth="1.5" strokeLinecap="round" />
-      <circle cx="2" cy="34" r="1.8" fill="rgba(201,168,76,0.5)" />
-      <circle cx="34" cy="2" r="1.8" fill="rgba(201,168,76,0.5)" />
+    <svg className={`absolute ${classes[position]} w-9 h-9 pointer-events-none`} viewBox="0 0 36 36" fill="none">
+      <path d="M2 34 L2 7 Q2 2 7 2 L34 2" stroke="rgba(196,114,138,0.4)" strokeWidth="1.5" strokeLinecap="round" />
+      <circle cx="2" cy="34" r="1.8" fill="rgba(196,114,138,0.45)" />
+      <circle cx="34" cy="2" r="1.8" fill="rgba(196,114,138,0.45)" />
     </svg>
   );
 }
@@ -44,7 +40,7 @@ export function TimelineSector({ number, label, title, description, isEven }: Ti
       {/* Vertical timeline line */}
       <div
         className="hidden md:block absolute left-1/2 top-0 bottom-0 w-px -translate-x-1/2 z-0"
-        style={{ background: 'linear-gradient(to bottom, transparent, rgba(201,168,76,0.2), transparent)' }}
+        style={{ background: 'linear-gradient(to bottom, transparent, rgba(196,114,138,0.2), transparent)' }}
       />
 
       {/* Timeline node */}
@@ -52,23 +48,19 @@ export function TimelineSector({ number, label, title, description, isEven }: Ti
         initial={{ scale: 0 }}
         whileInView={{ scale: 1 }}
         viewport={{ once: true }}
-        transition={{ duration: 0.5, delay: 0.35, type: 'spring', stiffness: 240 }}
+        transition={{ duration: 0.5, delay: 0.3, type: 'spring', stiffness: 240 }}
         className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20"
       >
         <div className="relative w-8 h-8 flex items-center justify-center">
-          <div
-            className="absolute inset-0 rounded-full animate-ping-slow"
-            style={{ background: 'rgba(201,168,76,0.15)' }}
-          />
+          <div className="absolute inset-0 rounded-full animate-ping-slow" style={{ background: 'rgba(196,114,138,0.15)' }} />
           <div
             className="w-5 h-5 rounded-full ring-1 flex items-center justify-center"
             style={{
-              background: 'radial-gradient(circle, rgba(201,168,76,0.6) 0%, rgba(201,168,76,0.15) 100%)',
-              ringColor: 'rgba(201,168,76,0.4)',
-              boxShadow: '0 0 12px rgba(201,168,76,0.35), 0 0 30px rgba(201,168,76,0.1)',
+              background: 'radial-gradient(circle, rgba(196,114,138,0.65) 0%, rgba(196,114,138,0.15) 100%)',
+              boxShadow: '0 0 12px rgba(196,114,138,0.4), 0 0 30px rgba(196,114,138,0.12)',
             }}
           >
-            <div className="w-2 h-2 rounded-full" style={{ background: 'rgba(245,217,138,0.9)' }} />
+            <div className="w-2 h-2 rounded-full" style={{ background: 'rgba(255,214,228,0.9)' }} />
           </div>
         </div>
       </motion.div>
@@ -76,32 +68,33 @@ export function TimelineSector({ number, label, title, description, isEven }: Ti
       {/* Text side */}
       <div className="w-full md:w-1/2 flex flex-col items-center md:items-start text-center md:text-left z-10">
         <div className={`w-full flex flex-col ${isEven ? 'md:items-end md:text-right' : 'md:items-start md:text-left'} px-4 md:px-8`}>
-          {/* Chapter label */}
+
+          {/* Label with tiny hearts */}
           <div className={`flex items-center gap-2 mb-3 ${isEven ? 'justify-center md:justify-end' : 'justify-center md:justify-start'}`}>
-            <svg width="16" height="16" viewBox="0 0 20 20" fill="rgba(201,168,76,0.5)">
-              <path d="M10 0 L11.5 8.5 L20 10 L11.5 11.5 L10 20 L8.5 11.5 L0 10 L8.5 8.5 Z" />
+            <svg width="12" height="11" viewBox="0 0 20 18" fill="rgba(196,114,138,0.5)">
+              <path d="M10 0 C10 0 0 6 0 11 C0 15 4.5 18 10 18 C15.5 18 20 15 20 11 C20 6 10 0 10 0Z" />
             </svg>
-            <span className="text-[10px] font-semibold tracking-[0.25em] uppercase font-sans text-gold">
+            <span className="text-[10px] font-semibold tracking-[0.25em] uppercase font-sans" style={{ color: '#C4728A' }}>
               {label} {String(number).padStart(2, '0')}
             </span>
-            <svg width="16" height="16" viewBox="0 0 20 20" fill="rgba(201,168,76,0.5)">
-              <path d="M10 0 L11.5 8.5 L20 10 L11.5 11.5 L10 20 L8.5 11.5 L0 10 L8.5 8.5 Z" />
+            <svg width="12" height="11" viewBox="0 0 20 18" fill="rgba(196,114,138,0.5)">
+              <path d="M10 0 C10 0 0 6 0 11 C0 15 4.5 18 10 18 C15.5 18 20 15 20 11 C20 6 10 0 10 0Z" />
             </svg>
           </div>
 
           {/* Title */}
-          <h3 className="text-3xl md:text-4xl font-serif mb-4 leading-tight text-cream">
+          <h3 className="text-3xl md:text-4xl font-serif mb-4 leading-tight" style={{ color: '#F5D0DC' }}>
             {title}
           </h3>
 
-          {/* Gold rule */}
+          {/* Rose rule */}
           <div
             className={`w-10 h-px mb-4 ${isEven ? 'md:ml-auto' : ''}`}
-            style={{ background: 'linear-gradient(90deg, rgba(201,168,76,0.8), rgba(114,50,160,0.4))' }}
+            style={{ background: 'linear-gradient(90deg, rgba(196,114,138,0.8), rgba(155,127,200,0.4))' }}
           />
 
           {/* Description */}
-          <p className="leading-relaxed max-w-xs text-sm md:text-base font-sans text-parchment">
+          <p className="leading-relaxed max-w-xs text-sm md:text-base font-sans" style={{ color: 'rgba(240,168,190,0.65)' }}>
             {description}
           </p>
         </div>
@@ -114,12 +107,12 @@ export function TimelineSector({ number, label, title, description, isEven }: Ti
           transition={{ type: 'spring', stiffness: 280 }}
           className="relative"
         >
-          {/* Outer gold glow */}
+          {/* Outer glow */}
           <div
             className="absolute -inset-px rounded-xl transition-all duration-500"
             style={{
-              background: 'linear-gradient(135deg, rgba(201,168,76,0.15), rgba(114,50,160,0.1), rgba(201,168,76,0.1))',
-              boxShadow: '0 0 40px rgba(201,168,76,0.08), 0 0 80px rgba(114,50,160,0.06)',
+              background: 'linear-gradient(135deg, rgba(196,114,138,0.12), rgba(155,127,200,0.09), rgba(196,114,138,0.08))',
+              boxShadow: '0 0 40px rgba(196,114,138,0.08), 0 0 80px rgba(155,127,200,0.06)',
             }}
           />
 
@@ -127,39 +120,33 @@ export function TimelineSector({ number, label, title, description, isEven }: Ti
           <div
             className="relative aspect-[4/3] w-full max-w-md mx-auto rounded-xl overflow-hidden group"
             style={{
-              background: 'linear-gradient(135deg, rgba(20,10,40,0.9), rgba(10,8,30,0.95))',
-              border: '1px solid rgba(201,168,76,0.2)',
-              boxShadow: '0 0 0 1px rgba(201,168,76,0.08), inset 0 0 40px rgba(201,168,76,0.03)',
+              background: 'linear-gradient(135deg, rgba(30,8,20,0.9), rgba(20,6,16,0.95))',
+              border: '1px solid rgba(196,114,138,0.22)',
+              boxShadow: '0 0 0 1px rgba(196,114,138,0.08), inset 0 0 40px rgba(196,114,138,0.03)',
             }}
           >
-            <Sparkles count={6} colors={['#D4AF37', '#F5D98A', '#A080D8']} />
+            <Sparkles count={6} colors={['#F0A8BE', '#CDB8F0', '#C4728A']} />
 
-            {/* Inner bracket corners */}
             <CornerBracket position="tl" />
             <CornerBracket position="tr" />
             <CornerBracket position="bl" />
             <CornerBracket position="br" />
 
-            {/* Inner dashed border */}
-            <div
-              className="absolute inset-4 rounded-lg z-10"
-              style={{ border: '1px dashed rgba(201,168,76,0.15)' }}
-            />
+            <div className="absolute inset-4 rounded-lg z-10" style={{ border: '1px dashed rgba(196,114,138,0.15)' }} />
 
-            {/* Subtle grid lines */}
+            {/* Subtle dot pattern */}
             <div
-              className="absolute inset-0 opacity-[0.03]"
+              className="absolute inset-0 opacity-[0.025]"
               style={{
-                backgroundImage: 'linear-gradient(rgba(201,168,76,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.5) 1px, transparent 1px)',
-                backgroundSize: '40px 40px',
+                backgroundImage: 'radial-gradient(circle, rgba(196,114,138,0.8) 1px, transparent 1px)',
+                backgroundSize: '24px 24px',
               }}
             />
 
-            {/* Radial background glow */}
             <div
               className="absolute inset-0"
               style={{
-                background: 'radial-gradient(circle at 30% 30%, rgba(201,168,76,0.04), transparent 60%), radial-gradient(circle at 70% 70%, rgba(114,50,160,0.06), transparent 60%)',
+                background: 'radial-gradient(circle at 30% 30%, rgba(196,114,138,0.05), transparent 60%), radial-gradient(circle at 70% 70%, rgba(155,127,200,0.07), transparent 60%)',
               }}
             />
 
@@ -169,19 +156,16 @@ export function TimelineSector({ number, label, title, description, isEven }: Ti
                 animate={{ y: [0, -5, 0] }}
                 transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
                 className="w-14 h-14 rounded-full flex items-center justify-center transition-colors duration-300"
-                style={{
-                  background: 'rgba(201,168,76,0.08)',
-                  border: '1px solid rgba(201,168,76,0.2)',
-                }}
+                style={{ background: 'rgba(196,114,138,0.08)', border: '1px solid rgba(196,114,138,0.2)' }}
               >
-                <ImageIcon className="w-6 h-6" style={{ color: 'rgba(201,168,76,0.5)' }} />
+                <ImageIcon className="w-6 h-6" style={{ color: 'rgba(196,114,138,0.5)' }} />
               </motion.div>
-              <span className="text-xs font-sans tracking-widest uppercase text-gold-muted opacity-60">
-                Add your photo
+              <span className="text-xs font-sans tracking-widest uppercase" style={{ color: 'rgba(196,114,138,0.4)' }}>
+                Add Angel's photo
               </span>
               <div className="flex gap-1.5 mt-0.5">
                 {[0, 1, 2].map(i => (
-                  <div key={i} className="w-1 h-1 rounded-full" style={{ background: 'rgba(201,168,76,0.25)' }} />
+                  <div key={i} className="w-1 h-1 rounded-full" style={{ background: 'rgba(196,114,138,0.28)' }} />
                 ))}
               </div>
             </div>
