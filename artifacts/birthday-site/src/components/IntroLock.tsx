@@ -220,46 +220,6 @@ export function IntroLock({ onUnlocked }: { onUnlocked: () => void }) {
             </motion.div>
           ))}
 
-          {/* ── Title ── */}
-          <motion.div
-            className="text-center mb-5 z-10 px-4"
-            initial={{ opacity: 0, y: -18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.25 }}
-          >
-            <AnimatePresence mode="wait">
-              <motion.h1
-                key={allDone ? 'done' : 'wish'}
-                className="font-script mb-1"
-                style={{
-                  fontSize: 'clamp(2rem, 8vw, 3.2rem)',
-                  color: '#F5D0DC',
-                  textShadow: '0 0 30px rgba(196,114,138,0.45)',
-                }}
-                initial={{ opacity: 0, y: -8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 8 }}
-                transition={{ duration: 0.4 }}
-              >
-                {allDone ? '✨ Wish Granted!' : 'Make a Wish, Angel!'}
-              </motion.h1>
-            </AnimatePresence>
-
-            <motion.p
-              key={blownCount}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.3 }}
-              className="font-sans text-[11px] tracking-[0.28em] uppercase"
-              style={{ color: 'rgba(196,114,138,0.6)' }}
-            >
-              {allDone
-                ? 'Opening your surprise…'
-                : blownCount === 0
-                  ? 'Tap a candle to blow it out'
-                  : `${CANDLES.length - blownCount} candle${CANDLES.length - blownCount !== 1 ? 's' : ''} left`}
-            </motion.p>
-          </motion.div>
 
           {/* ── CAKE SVG ── */}
           <motion.div
@@ -474,23 +434,7 @@ export function IntroLock({ onUnlocked }: { onUnlocked: () => void }) {
 
           {/* ── All blown celebration ── */}
           <AnimatePresence>
-            {phase === 'allBlown' && (
-              <>
-                <ConfettiBurst />
-                <motion.div
-                  key="celebration"
-                  className="absolute bottom-14 text-center z-20"
-                  initial={{ opacity: 0, scale: 0.65, y: 24 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  transition={{ type: 'spring', stiffness: 220, damping: 16 }}
-                >
-                  <p className="font-serif text-xl md:text-2xl"
-                    style={{ color: '#F5D0DC', textShadow: '0 0 20px rgba(196,114,138,0.5)' }}>
-                    🎂 Happy Birthday, Angel! 🎂
-                  </p>
-                </motion.div>
-              </>
-            )}
+            {phase === 'allBlown' && <ConfettiBurst />}
           </AnimatePresence>
 
           {/* ── Tap hint when no candles blown ── */}
