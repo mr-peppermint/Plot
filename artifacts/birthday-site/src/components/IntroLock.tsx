@@ -1,5 +1,85 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+
+/* ── Music Engine (Web Audio API) ───────────────── */
+const BEAT = 60 / 76; // seconds per beat at 76 BPM
+
+// Pentatonic-major melody — sweet & looping
+const MELODY: [number, number][] = [
+  // Bar 1 — G5 E5 C5 E5
+  [784.00, BEAT], [659.25, BEAT], [523.25, BEAT], [659.25, BEAT],
+  // Bar 2 — A4 C5 E5 C5
+  [440.00, BEAT], [523.25, BEAT], [659.25, BEAT], [523.25, BEAT],
+  // Bar 3 — G4 A4 C5 A4
+  [392.00, BEAT], [440.00, BEAT], [523.25, BEAT], [440.00, BEAT],
+  // Bar 4 — G4 hold
+  [392.00, BEAT * 4],
+  // Bar 5 — E5 G5 A5 G5
+  [659.25, BEAT], [784.00, BEAT], [880.00, BEAT], [784.00, BEAT],
+  // Bar 6 — E5 C5 G4 A4
+  [659.25, BEAT], [523.25, BEAT], [392.00, BEAT], [440.00, BEAT],
+  // Bar 7 — C5 E5 G5 E5
+  [523.25, BEAT], [659.25, BEAT], [784.00, BEAT], [659.25, BEAT],
+  // Bar 8 — C5 hold
+  [523.25, BEAT * 4],
+];
+
+const LOOP_DUR = MELODY.reduce((s, [, d]) => s + d, 0);
+
+function scheduleLoop(ctx: AudioContext, master: GainNode, t0: number) {
+  let t = t0;
+  for (const [freq, dur] of MELODY) {
+    if (freq > 0) {
+      // Main tone — sine (music-box tine character)
+      const osc  = ctx.createOscillator();
+      const env  = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, t);
+      env.gain.setValueAtTime(0, t);
+      env.gain.linearRampToValueAtTime(0.85, t + 0.013);
+      env.gain.exponentialRampToValueAtTime(0.001, t + Math.min(dur * 0.75, 0.5));
+      osc.connect(env); env.connect(master);
+      osc.start(t); osc.stop(t + dur);
+
+      // Shimmer octave — very quiet, adds warmth
+      const osc2  = ctx.createOscillator();
+      const env2  = ctx.createGain();
+      osc2.type = 'sine';
+      osc2.frequency.setValueAtTime(freq * 2, t);
+      env2.gain.setValueAtTime(0, t);
+      env2.gain.linearRampToValueAtTime(0.12, t + 0.013);
+      env2.gain.exponentialRampToValueAtTime(0.001, t + Math.min(dur * 0.5, 0.25));
+      osc2.connect(env2); env2.connect(master);
+      osc2.start(t); osc2.stop(t + dur);
+    }
+    t += dur;
+  }
+}
+
+function startMusic(ctx: AudioContext): () => void {
+  const master = ctx.createGain();
+  master.gain.setValueAtTime(0, ctx.currentTime);
+  master.gain.linearRampToValueAtTime(0.22, ctx.currentTime + 3); // gentle fade-in
+  master.connect(ctx.destination);
+
+  let active = true;
+
+  const loop = (startAt: number) => {
+    if (!active) return;
+    scheduleLoop(ctx, master, startAt);
+    // Re-schedule 2 s before end so there is no gap
+    setTimeout(() => loop(startAt + LOOP_DUR), (LOOP_DUR - 2) * 1000);
+  };
+
+  loop(ctx.currentTime + 0.4);
+
+  return () => {
+    active = false;
+    const now = ctx.currentTime;
+    master.gain.setValueAtTime(master.gain.value, now);
+    master.gain.linearRampToValueAtTime(0, now + 1.8);
+  };
+}
 
 /* ── Candle config ─────────────────────────────── */
 const CANDLES = [
@@ -151,7 +231,72 @@ export function IntroLock({ onUnlocked }: { onUnlocked: () => void }) {
   const [smokeIds, setSmokeIds] = useState<number[]>([]);
   const [sparkIds, setSparkIds] = useState<number[]>([]);
   const [phase, setPhase]       = useState<'active' | 'allBlown' | 'exit'>('active');
+  const [muted, setMuted]       = useState(false);
   const doneRef                 = useRef(false);
+  const ctxRef                  = useRef<AudioContext | null>(null);
+  const stopMusicRef            = useRef<(() => void) | null>(null);
+  const mutedRef                = useRef(false);
+  const masterVolRef            = useRef<GainNode | null>(null);
+
+  // Start audio — tries on mount, retries on first interaction (mobile policy)
+  useEffect(() => {
+    let ctx: AudioContext | null = null;
+    let stopped = false;
+
+    const boot = async () => {
+      if (ctxRef.current) return;
+      ctx = new AudioContext();
+      ctxRef.current = ctx;
+      // Create a top-level mute gate so we can toggle without stopping
+      const muteGate = ctx.createGain();
+      muteGate.gain.value = 1;
+      masterVolRef.current = muteGate;
+      muteGate.connect(ctx.destination);
+      if (ctx.state === 'suspended') await ctx.resume();
+      if (stopped) return;
+      // Wrap startMusic to route through muteGate
+      const master = ctx.createGain();
+      master.gain.setValueAtTime(0, ctx.currentTime);
+      master.gain.linearRampToValueAtTime(0.22, ctx.currentTime + 3);
+      master.connect(muteGate);
+      let active = true;
+      const loop = (startAt: number) => {
+        if (!active) return;
+        scheduleLoop(ctx!, master, startAt);
+        setTimeout(() => loop(startAt + LOOP_DUR), (LOOP_DUR - 2) * 1000);
+      };
+      loop(ctx.currentTime + 0.4);
+      stopMusicRef.current = () => {
+        active = false;
+        const now = ctx!.currentTime;
+        master.gain.setValueAtTime(master.gain.value, now);
+        master.gain.linearRampToValueAtTime(0, now + 1.8);
+      };
+    };
+
+    boot();
+    const onTouch = () => boot();
+    document.addEventListener('pointerdown', onTouch, { once: true });
+
+    return () => {
+      stopped = true;
+      document.removeEventListener('pointerdown', onTouch);
+      stopMusicRef.current?.();
+      setTimeout(() => ctx?.close(), 2200);
+    };
+  }, []);
+
+  const toggleMute = useCallback(() => {
+    mutedRef.current = !mutedRef.current;
+    setMuted(mutedRef.current);
+    if (masterVolRef.current && ctxRef.current) {
+      masterVolRef.current.gain.setTargetAtTime(
+        mutedRef.current ? 0 : 1,
+        ctxRef.current.currentTime,
+        0.1,
+      );
+    }
+  }, []);
 
   const blowCandle = useCallback((id: number) => {
     if (blown[id] || phase !== 'active') return;
@@ -168,6 +313,7 @@ export function IntroLock({ onUnlocked }: { onUnlocked: () => void }) {
       if (next.every(Boolean) && !doneRef.current) {
         doneRef.current = true;
         setTimeout(() => setPhase('allBlown'), 300);
+        setTimeout(() => { stopMusicRef.current?.(); }, 1800);
         setTimeout(() => setPhase('exit'), 2400);
         setTimeout(() => onUnlocked(), 3300);
       }
@@ -190,6 +336,26 @@ export function IntroLock({ onUnlocked }: { onUnlocked: () => void }) {
           exit={{ opacity: 0, scale: 1.04 }}
           transition={{ duration: 1.1, ease: 'easeInOut' }}
         >
+
+          {/* Mute button */}
+          <motion.button
+            onClick={toggleMute}
+            className="absolute top-4 right-4 z-20 flex items-center justify-center rounded-full w-9 h-9"
+            style={{
+              background: 'rgba(196,114,138,0.15)',
+              border: '1px solid rgba(196,114,138,0.3)',
+              color: 'rgba(240,168,190,0.8)',
+              fontSize: 16,
+            }}
+            whileHover={{ scale: 1.12, background: 'rgba(196,114,138,0.25)' }}
+            whileTap={{ scale: 0.9 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.5 }}
+            title={muted ? 'Unmute' : 'Mute'}
+          >
+            {muted ? '🔇' : '🎵'}
+          </motion.button>
 
           {/* Floating star field */}
           {Array.from({ length: 55 }, (_, i) => (
