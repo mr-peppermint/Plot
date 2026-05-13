@@ -1,454 +1,520 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
-import { motion, AnimatePresence, useAnimation } from 'framer-motion';
+import { useState, useCallback, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
-const TOTAL_TAPS = 10;
-interface Ripple { id: number; x: number; y: number }
+/* ── Candle config ─────────────────────────────── */
+const CANDLES = [
+  { id: 0, x: 108, color: '#F0A8BE', shine: '#FFE4EE' },
+  { id: 1, x: 154, color: '#C4728A', shine: '#F5B8C8' },
+  { id: 2, x: 200, color: '#C8B0F0', shine: '#EDD8FF' },
+  { id: 3, x: 246, color: '#C4728A', shine: '#F5B8C8' },
+  { id: 4, x: 292, color: '#F0A8BE', shine: '#FFE4EE' },
+];
 
-/* ─────────────────────────────────────────────────────
-   Rose-gold medieval key
-   Colors matched to main site: #F0A8BE #C4728A #B89CD8
-───────────────────────────────────────────────────── */
-function MedievalKey({ progress }: { progress: number }) {
+const WICK_TOP_Y    = 74;   // top of wick (flame anchor)
+const CANDLE_TOP_Y  = 84;   // top of candle body
+const CANDLE_BTM_Y  = 144;  // bottom of candle (sits on tier top)
+
+/* ── Animated Flame ────────────────────────────── */
+function Flame({ seed }: { seed: number }) {
+  const dur = 0.45 + (seed % 5) * 0.08;
   return (
-    <svg
-      width="96" height="230"
-      viewBox="0 0 80 200"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      style={{
-        filter: `drop-shadow(0 0 ${8 + progress * 16}px rgba(196,114,138,0.75))
-                 drop-shadow(0 0 ${3 + progress * 6}px rgba(240,168,190,0.5))`,
+    <motion.g
+      transformOrigin="0px 0px"
+      animate={{
+        x: [0, 1.4, -1.2, 0.8, -1.6, 1.0, 0],
+        scaleX: [1, 1.10, 0.84, 1.14, 0.88, 1.06, 1],
+        scaleY: [1, 0.95, 1.07, 0.91, 1.05, 0.97, 1],
       }}
+      transition={{ duration: dur, repeat: Infinity, ease: 'easeInOut', delay: seed * 0.09 }}
     >
-      <defs>
-        <linearGradient id="rg1" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%"   stopColor="#FFE0EC" />
-          <stop offset="35%"  stopColor="#E8A8BE" />
-          <stop offset="70%"  stopColor="#C4728A" />
-          <stop offset="100%" stopColor="#9B5C72" />
-        </linearGradient>
-        <linearGradient id="rg2" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stopColor="#F0A8BE" />
-          <stop offset="50%"  stopColor="#C4728A" />
-          <stop offset="100%" stopColor="#8B4A62" />
-        </linearGradient>
-        <linearGradient id="lv1" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%"   stopColor="#E8D8FF" />
-          <stop offset="50%"  stopColor="#B89CD8" />
-          <stop offset="100%" stopColor="#7C5CA8" />
-        </linearGradient>
-        <radialGradient id="gem" cx="50%" cy="40%" r="60%">
-          <stop offset="0%"   stopColor="#FFE8F0" />
-          <stop offset="40%"  stopColor="#E8A8C0" />
-          <stop offset="100%" stopColor="#9B5C72" />
-        </radialGradient>
-        <radialGradient id="lvgem" cx="50%" cy="40%" r="60%">
-          <stop offset="0%"   stopColor="#EEE0FF" />
-          <stop offset="40%"  stopColor="#B89CD8" />
-          <stop offset="100%" stopColor="#7C5CA8" />
-        </radialGradient>
-      </defs>
-
-      {/* ── Outer bow ring ── */}
-      <circle cx="40" cy="33" r="28" stroke="url(#rg1)" strokeWidth="2.8" fill="rgba(14,5,9,0.7)" />
-
-      {/* ── Inner decorative ring ── */}
-      <circle cx="40" cy="33" r="20" stroke="url(#rg1)" strokeWidth="1.1" fill="none" opacity="0.55" />
-
-      {/* ── Quatrefoil petals ── */}
-      {([[40,13],[61,33],[40,53],[19,33]] as [number,number][]).map(([cx, cy], i) => (
-        <ellipse key={i} cx={cx} cy={cy} rx="8" ry="8"
-          fill={i % 2 === 0 ? 'rgba(196,114,138,0.28)' : 'rgba(184,156,216,0.28)'}
-          stroke={i % 2 === 0 ? 'url(#rg1)' : 'url(#lv1)'} strokeWidth="1.1" />
-      ))}
-
-      {/* ── Center gem ── */}
-      <circle cx="40" cy="33" r="7.5" fill="url(#gem)" />
-      <ellipse cx="37.5" cy="30.5" rx="2.5" ry="1.5" fill="rgba(255,255,255,0.55)" />
-
-      {/* ── Four corner dots on bow ── */}
-      {[[-90,28],[0,33],[90,28],[180,33]].map(([deg, r], i) => {
-        const a = (deg - 90) * Math.PI / 180;
-        return <circle key={i} cx={40 + 28 * Math.cos(a)} cy={33 + 28 * Math.sin(a)} r="2.8" fill="url(#rg1)" />;
-      })}
-
-      {/* ── Top ornament ── */}
-      <path d="M40 5 L40 9" stroke="url(#rg1)" strokeWidth="2" strokeLinecap="round" />
-      <path d="M34 6.5 L46 6.5" stroke="url(#rg1)" strokeWidth="1.5" strokeLinecap="round" />
-      <circle cx="40" cy="5" r="2" fill="url(#lv1)" />
-
-      {/* ── Shank ── */}
-      <rect x="37" y="60" width="7" height="100" rx="2.5" fill="url(#rg2)" />
-
-      {/* ── Shank collars ── */}
-      {[76, 94, 112].map((y, i) => (
-        <g key={i}>
-          <rect x="33.5" y={y} width="13" height="4.5" rx="2.25" fill="url(#rg1)" />
-          <rect x="35" y={y + 1.5} width="10" height="1.5" rx="0.75" fill="rgba(255,220,235,0.4)" />
-        </g>
-      ))}
-
-      {/* ── Bit / teeth (right side) ── */}
-      <rect x="44" y="128" width="18" height="7" rx="2" fill="url(#rg1)" />
-      <rect x="44" y="143" width="13" height="6.5" rx="2" fill="url(#rg1)" />
-      <rect x="44" y="157" width="16" height="6.5" rx="2" fill="url(#rg1)" />
-
-      {/* ── Tip ── */}
-      <path d="M37 158 L37 173 Q40.5 179 44 173 L44 158 Z" fill="url(#rg2)" />
-
-      {/* ── Shank highlight streak ── */}
-      <rect x="39" y="62" width="2" height="96" rx="1" fill="rgba(255,210,225,0.25)" />
-
-      {/* ── Small lavender gems on collars ── */}
-      {[78, 96, 114].map((y, i) => (
-        <circle key={i} cx="40" cy={y + 0.5} r="1.6" fill="url(#lvgem)" />
-      ))}
-    </svg>
+      {/* Glow halo */}
+      <ellipse cx="0" cy="-16" rx="11" ry="18" fill="rgba(255,110,0,0.18)" />
+      <ellipse cx="0" cy="-12" rx="7"  ry="12" fill="rgba(255,180,0,0.22)" />
+      {/* Outer flame */}
+      <path d="M0,0 C-7,-11 -11,-26 0,-40 C11,-26 7,-11 0,0 Z"
+        fill="url(#fl_outer)" />
+      {/* Mid flame */}
+      <path d="M0,-2 C-4,-12 -6,-22 0,-30 C6,-22 4,-12 0,-2 Z"
+        fill="url(#fl_mid)" />
+      {/* Bright core */}
+      <path d="M0,-2 C-2,-9 -3,-17 0,-23 C3,-17 2,-9 0,-2 Z"
+        fill="rgba(255,252,180,0.95)" />
+      {/* White tip */}
+      <ellipse cx="0" cy="-24" rx="1.8" ry="2.8" fill="rgba(255,255,240,1)" />
+    </motion.g>
   );
 }
 
-/* ─────────────────────────────────────────────────────
-   3-D Hole Keyhole
-   No glow — pure depth illusion: dark layered gradients
-   giving the feeling of a real hole punched in the screen
-───────────────────────────────────────────────────── */
-function KeyholeHole() {
+/* ── Smoke puff after blow ─────────────────────── */
+function SmokePuff({ cx }: { cx: number }) {
+  const puffs = [
+    { dx: 0,   sz: 2,   delay: 0    },
+    { dx: -4,  sz: 2.5, delay: 0.12 },
+    { dx: 4,   sz: 2.2, delay: 0.22 },
+    { dx: -2,  sz: 3,   delay: 0.36 },
+    { dx: 3,   sz: 2.4, delay: 0.48 },
+  ];
   return (
-    <div className="relative flex items-center justify-center" style={{ width: 200, height: 270 }}>
-
-      {/* Very faint ambient shadow on the screen surface around the hole */}
-      <div className="absolute inset-0 rounded-2xl pointer-events-none"
-        style={{
-          boxShadow: 'inset 0 0 60px rgba(0,0,0,0.7)',
-          background: 'radial-gradient(ellipse at 50% 38%, rgba(8,2,6,0.5) 0%, transparent 70%)',
-          borderRadius: 24,
-        }}
-      />
-
-      {/* The plate surface (worn metal / stone) */}
-      <div className="absolute inset-0 rounded-2xl overflow-hidden"
-        style={{
-          background: 'linear-gradient(160deg, rgba(40,16,26,0.95) 0%, rgba(20,7,14,0.98) 55%, rgba(30,10,20,0.95) 100%)',
-          border: '1px solid rgba(196,114,138,0.18)',
-          boxShadow: '0 8px 40px rgba(0,0,0,0.8), inset 0 1px 0 rgba(196,114,138,0.1)',
-        }}
-      >
-        {/* Subtle texture lines on plate */}
-        {[30,60,90,120,150,180,210,240].map(y => (
-          <div key={y} className="absolute w-full" style={{ top: y, height: 1, background: 'rgba(196,114,138,0.035)' }} />
-        ))}
-
-        {/* Corner rivets */}
-        {[[18,18],[182,18],[18,252],[182,252]].map(([cx,cy], i) => (
-          <div key={i} className="absolute rounded-full"
-            style={{
-              width: 12, height: 12,
-              left: cx - 6, top: cy - 6,
-              background: 'radial-gradient(circle at 35% 35%, rgba(240,168,190,0.6), rgba(100,40,60,0.8))',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,200,220,0.15)',
-            }}
-          />
-        ))}
-
-        {/* Plate edge engravings */}
-        <div className="absolute inset-4 rounded-xl pointer-events-none"
-          style={{ border: '1px solid rgba(196,114,138,0.12)' }} />
-      </div>
-
-      {/* ─── THE HOLE ITSELF ─── */}
-      <svg
-        className="absolute"
-        width="200" height="270"
-        viewBox="0 0 200 270"
-        style={{ filter: 'drop-shadow(0 4px 24px rgba(0,0,0,0.95))' }}
-      >
-        <defs>
-          {/* Rim gradient — lighter at top-left (light source), darker at bottom-right */}
-          <radialGradient id="rimGrad" cx="38%" cy="30%" r="75%">
-            <stop offset="0%"   stopColor="rgba(80,30,45,0.9)" />
-            <stop offset="40%"  stopColor="rgba(25,8,16,0.95)" />
-            <stop offset="100%" stopColor="rgba(0,0,0,1)" />
-          </radialGradient>
-
-          {/* Deep hole: perfectly black core with depth rings */}
-          <radialGradient id="holeDeep" cx="50%" cy="42%" r="55%">
-            <stop offset="0%"   stopColor="rgba(0,0,0,1)" />
-            <stop offset="60%"  stopColor="rgba(3,1,2,1)" />
-            <stop offset="100%" stopColor="rgba(0,0,0,1)" />
-          </radialGradient>
-
-          {/* Hole edge rim — the lit "bevel" on the top edge */}
-          <linearGradient id="topRim" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"   stopColor="rgba(196,114,138,0.28)" />
-            <stop offset="100%" stopColor="rgba(196,114,138,0)" />
-          </linearGradient>
-
-          <clipPath id="holeMask">
-            {/* Top circle of keyhole */}
-            <circle cx="100" cy="102" r="48" />
-            {/* Bottom trapezoid */}
-            <path d="M74 146 L62 230 L138 230 L126 146 Z" />
-          </clipPath>
-        </defs>
-
-        {/* The hole — filled with pure blackness */}
-        <g clipPath="url(#holeMask)">
-          {/* Absolute black fill */}
-          <rect x="0" y="0" width="200" height="270" fill="#000000" />
-
-          {/* Depth gradient — subtle variation so it doesn't look flat */}
-          <circle cx="100" cy="102" r="48" fill="url(#rimGrad)" opacity="0.6" />
-
-          {/* Inner depth rings (concentric) to create 3D recess illusion */}
-          <circle cx="100" cy="104" r="44" fill="none" stroke="rgba(0,0,0,0.7)" strokeWidth="6" />
-          <circle cx="100" cy="106" r="36" fill="none" stroke="rgba(0,0,0,0.5)" strokeWidth="5" />
-          <circle cx="100" cy="108" r="27" fill="none" stroke="rgba(0,0,0,0.3)" strokeWidth="4" />
-        </g>
-
-        {/* ── Beveled rim — top highlight on the hole edge ── */}
-        {/* Circle rim */}
-        <circle cx="100" cy="102" r="48"
-          fill="none" stroke="url(#topRim)" strokeWidth="2.5" />
-
-        {/* The very top edge gets a hair of rose-gold light (top of the bevel) */}
-        <path d="M 62 92 A 48 48 0 0 1 138 92"
-          fill="none" stroke="rgba(220,160,185,0.35)" strokeWidth="1.5" strokeLinecap="round" />
-
-        {/* Bottom trapezoid rim */}
-        <path d="M74 146 L62 230 L138 230 L126 146 Z"
-          fill="none" stroke="rgba(180,100,130,0.2)" strokeWidth="1.5" strokeLinejoin="round" />
-
-        {/* Left inner shadow of trapezoid (3d left wall of hole) */}
-        <path d="M74 146 L62 230"
-          stroke="rgba(255,180,210,0.12)" strokeWidth="1" strokeLinecap="round" />
-
-        {/* Hole edge outer shadow to blend into plate */}
-        <circle cx="100" cy="102" r="49.5"
-          fill="none" stroke="rgba(0,0,0,0.6)" strokeWidth="4" />
-        <path d="M73.5 147 L61 231 L139 231 L127.5 147"
-          fill="none" stroke="rgba(0,0,0,0.6)" strokeWidth="4" strokeLinejoin="round" />
-      </svg>
-    </div>
-  );
-}
-
-/* ─────────────────────────────────────────────────────
-   Progress dots — rose theme
-───────────────────────────────────────────────────── */
-function TapProgress({ taps }: { taps: number }) {
-  return (
-    <div className="flex gap-2.5 items-center justify-center">
-      {[...Array(TOTAL_TAPS)].map((_, i) => (
-        <motion.div key={i}
-          animate={i < taps ? { scale: [1, 1.5, 1] } : { scale: 1 }}
-          transition={{ duration: 0.3 }}
-          style={{
-            width:  i < taps ? 10 : 7,
-            height: i < taps ? 10 : 7,
-            borderRadius: '50%',
-            background: i < taps
-              ? 'radial-gradient(circle, #F5D0DC, #C4728A)'
-              : 'rgba(196,114,138,0.22)',
-            border: i < taps ? 'none' : '1px solid rgba(196,114,138,0.32)',
-            boxShadow: i < taps ? '0 0 8px rgba(196,114,138,0.65)' : 'none',
-            transition: 'all 0.3s',
-          }}
+    <>
+      {puffs.map((p, i) => (
+        <motion.ellipse
+          key={i}
+          cx={cx + p.dx}
+          cy={WICK_TOP_Y}
+          rx={p.sz}
+          ry={p.sz * 0.65}
+          fill="rgba(200,175,185,0.65)"
+          animate={{ y: -60, opacity: 0, scaleX: 4, scaleY: 3 }}
+          transition={{ duration: 1.4, delay: p.delay, ease: 'easeOut' }}
         />
       ))}
+    </>
+  );
+}
+
+/* ── Sparkle burst on blow ─────────────────────── */
+function SparkBurst({ cx }: { cx: number }) {
+  const SPARKS = [
+    { angle: 0,   r: 30, color: '#FFD6E4' },
+    { angle: 50,  r: 24, color: '#C4728A' },
+    { angle: 100, r: 32, color: '#B89CD8' },
+    { angle: 160, r: 26, color: '#F0A8BE' },
+    { angle: 220, r: 28, color: '#FFD6E4' },
+    { angle: 280, r: 22, color: '#C4728A' },
+    { angle: 330, r: 30, color: '#B89CD8' },
+  ];
+  return (
+    <>
+      {SPARKS.map((s, i) => {
+        const rad = (s.angle * Math.PI) / 180;
+        return (
+          <motion.circle
+            key={i}
+            cx={cx}
+            cy={WICK_TOP_Y - 10}
+            r={3}
+            fill={s.color}
+            animate={{
+              x: s.r * Math.cos(rad),
+              y: s.r * Math.sin(rad),
+              opacity: 0,
+              scale: 0.4,
+            }}
+            transition={{ duration: 0.55, delay: i * 0.03, ease: 'easeOut' }}
+          />
+        );
+      })}
+    </>
+  );
+}
+
+/* ── Confetti burst (DOM layer) on all blown ───── */
+function ConfettiBurst() {
+  const pieces = Array.from({ length: 40 }, (_, i) => ({
+    id: i,
+    color: ['#F0A8BE','#C4728A','#B89CD8','#F5D0DC','#FFD6E4','#9B7FC8'][i % 6],
+    x: 30 + Math.random() * 40,
+    vx: (Math.random() - 0.5) * 300,
+    vy: -(180 + Math.random() * 220),
+    rot: Math.random() * 720,
+    shape: i % 3,
+    delay: Math.random() * 0.3,
+  }));
+  return (
+    <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
+      {pieces.map(p => (
+        <motion.div
+          key={p.id}
+          className="absolute"
+          style={{ left: `${p.x}%`, top: '55%' }}
+          initial={{ x: 0, y: 0, opacity: 1, rotate: 0 }}
+          animate={{ x: p.vx, y: p.vy, opacity: 0, rotate: p.rot }}
+          transition={{ duration: 1.6 + p.delay, delay: p.delay, ease: [0.2, 0.8, 0.4, 1] }}
+        >
+          {p.shape === 0 && <div style={{ width: 8, height: 8, borderRadius: '50%', background: p.color }} />}
+          {p.shape === 1 && <div style={{ width: 12, height: 5, background: p.color }} />}
+          {p.shape === 2 && (
+            <svg width="10" height="9" viewBox="0 0 20 18">
+              <path d="M10 0 C10 0 0 6 0 11 C0 15 4.5 18 10 18 C15.5 18 20 15 20 11 C20 6 10 0 10 0Z"
+                fill={p.color} />
+            </svg>
+          )}
+        </motion.div>
+      ))}
     </div>
   );
 }
 
-/* ─────────────────────────────────────────────────────
-   Main export
-───────────────────────────────────────────────────── */
+/* ── Main component ────────────────────────────── */
 export function IntroLock({ onUnlocked }: { onUnlocked: () => void }) {
-  const [taps, setTaps] = useState(0);
-  const [ripples, setRipples] = useState<Ripple[]>([]);
-  const [phase, setPhase] = useState<'locked' | 'unlocking' | 'fading'>('locked');
-  const keyAnim = useAnimation();
-  const processingRef = useRef(false);
+  const [blown, setBlown]       = useState<boolean[]>(CANDLES.map(() => false));
+  const [smokeIds, setSmokeIds] = useState<number[]>([]);
+  const [sparkIds, setSparkIds] = useState<number[]>([]);
+  const [phase, setPhase]       = useState<'active' | 'allBlown' | 'exit'>('active');
+  const doneRef                 = useRef(false);
 
-  const progress = Math.min(taps / TOTAL_TAPS, 1);
+  const blowCandle = useCallback((id: number) => {
+    if (blown[id] || phase !== 'active') return;
 
-  /* Key entrance: starts tiny + far (small scale) then floats to rest position above hole */
-  useEffect(() => {
-    keyAnim.start({
-      scale: 0.28,
-      opacity: 1,
-      y: -190,
-      transition: { duration: 1.4, delay: 0.3, ease: [0.22, 1, 0.36, 1] },
-    });
-  }, [keyAnim]);
+    // Show smoke + sparks, clear after animation
+    setSmokeIds(p => [...p, id]);
+    setSparkIds(p => [...p, id]);
+    setTimeout(() => setSmokeIds(p => p.filter(x => x !== id)), 2000);
+    setTimeout(() => setSparkIds(p => p.filter(x => x !== id)), 800);
 
-  const handlePointer = useCallback((e: React.PointerEvent) => {
-    if (phase !== 'locked' || processingRef.current) return;
-    e.preventDefault();
-
-    const id = Date.now() + Math.random();
-    setRipples(r => [...r, { id, x: e.clientX, y: e.clientY }]);
-    setTimeout(() => setRipples(r => r.filter(item => item.id !== id)), 900);
-
-    setTaps(prev => {
-      const next = Math.min(prev + 1, TOTAL_TAPS);
-      const prog = next / TOTAL_TAPS;
-
-      if (next >= TOTAL_TAPS) {
-        processingRef.current = true;
-        setPhase('unlocking');
-
-        // Key zooms in fully — as if coming all the way to the viewer
-        keyAnim.start({
-          scale: 3.5,
-          y: 0,
-          opacity: [1, 1, 0],
-          transition: { duration: 1.0, ease: [0.4, 0, 0.2, 1] },
-        });
-
-        setTimeout(() => setPhase('fading'), 900);
-        setTimeout(() => onUnlocked(), 1900);
-      } else {
-        // Each tap: key zooms slightly closer (scale grows) and moves toward hole
-        // scale: 0.28 → 0.9 over taps 0→9, y: -190 → -60
-        const newScale = 0.28 + prog * 0.62;
-        const newY    = -190 + prog * 130;
-
-        keyAnim.start({
-          scale: newScale,
-          y: [newY - 12, newY + 4, newY - 3, newY],   // jiggle on tap
-          rotate: [-3, 3, -1.5, 0],
-          transition: { duration: 0.4, ease: 'easeOut' },
-        });
+    setBlown(prev => {
+      const next = [...prev];
+      next[id] = true;
+      if (next.every(Boolean) && !doneRef.current) {
+        doneRef.current = true;
+        setTimeout(() => setPhase('allBlown'), 300);
+        setTimeout(() => setPhase('exit'), 2400);
+        setTimeout(() => onUnlocked(), 3300);
       }
       return next;
     });
-  }, [phase, keyAnim, onUnlocked]);
+  }, [blown, phase, onUnlocked]);
+
+  const blownCount = blown.filter(Boolean).length;
+  const allDone    = blownCount === CANDLES.length;
 
   return (
-    <AnimatePresence>
-      {phase !== 'fading' ? (
+    <AnimatePresence mode="wait">
+      {phase !== 'exit' && (
         <motion.div
-          key="intro"
-          className="fixed inset-0 z-[9999] flex flex-col items-center justify-center select-none touch-none overflow-hidden"
+          key="cake-intro"
+          className="fixed inset-0 z-[9999] flex flex-col items-center justify-center select-none overflow-hidden"
           style={{
-            background: 'radial-gradient(ellipse at 50% 35%, #1A0812 0%, #0E0509 45%, #060203 100%)',
-            cursor: 'pointer',
+            background: 'radial-gradient(ellipse at 50% 30%, #220A18 0%, #100508 55%, #050203 100%)',
           }}
-          onPointerDown={handlePointer}
+          exit={{ opacity: 0, scale: 1.04 }}
+          transition={{ duration: 1.1, ease: 'easeInOut' }}
         >
-          {/* ── Fine particle starfield (pink/mauve tinted) ── */}
-          <div className="absolute inset-0 pointer-events-none overflow-hidden">
-            {[...Array(70)].map((_, i) => {
-              const colors = ['rgba(240,168,190,', 'rgba(196,114,138,', 'rgba(184,156,216,', 'rgba(255,210,225,'];
-              const col = colors[i % colors.length];
-              return (
-                <motion.div key={i}
-                  className="absolute rounded-full"
-                  style={{
-                    width: Math.random() * 1.8 + 0.8,
-                    height: Math.random() * 1.8 + 0.8,
-                    left: `${Math.random() * 100}%`,
-                    top: `${Math.random() * 100}%`,
-                    background: `${col}${0.25 + Math.random() * 0.55})`,
-                  }}
-                  animate={{ opacity: [0.15, 0.85, 0.15] }}
-                  transition={{ duration: 1.8 + Math.random() * 3.5, repeat: Infinity, delay: Math.random() * 5 }}
-                />
-              );
-            })}
-          </div>
 
-          {/* ── Very subtle vignette ── */}
-          <div className="absolute inset-0 pointer-events-none"
-            style={{ background: 'radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(0,0,0,0.55) 100%)' }} />
+          {/* Floating star field */}
+          {Array.from({ length: 55 }, (_, i) => (
+            <motion.div key={i}
+              className="absolute rounded-full pointer-events-none"
+              style={{
+                width: 1 + (i % 3) * 0.8,
+                height: 1 + (i % 3) * 0.8,
+                left: `${(i * 13.7) % 100}%`,
+                top: `${(i * 17.3) % 100}%`,
+                background: ['rgba(240,168,190,','rgba(196,114,138,','rgba(184,156,216,'][i%3]
+                  + `${0.25 + (i % 4) * 0.12})`,
+              }}
+              animate={{ opacity: [0.1, 0.85, 0.1] }}
+              transition={{ duration: 2 + (i % 4), repeat: Infinity, delay: (i * 0.18) % 5 }}
+            />
+          ))}
 
-          {/* ── Tap ripples ── */}
-          <AnimatePresence>
-            {ripples.map(r => (
-              <motion.div key={r.id}
-                className="fixed pointer-events-none rounded-full"
-                style={{ left: r.x, top: r.y, x: '-50%', y: '-50%', background: 'radial-gradient(circle, rgba(196,114,138,0.4) 0%, rgba(240,168,190,0.12) 50%, transparent 70%)' }}
-                initial={{ width: 0, height: 0, opacity: 0.9 }}
-                animate={{ width: 180, height: 180, opacity: 0 }}
-                exit={{}}
-                transition={{ duration: 0.7, ease: 'easeOut' }}
-              />
-            ))}
-          </AnimatePresence>
-
-          {/* ── MAIN 3D SCENE ── */}
-          {/* Wrap in perspective container so the scale looks like true Z-axis movement */}
-          <div style={{ perspective: '900px', perspectiveOrigin: '50% 50%', position: 'relative' }}>
-            <div className="flex flex-col items-center" style={{ position: 'relative' }}>
-
-              {/* Key (flies toward viewer on Z axis) */}
-              <motion.div
-                animate={keyAnim}
-                initial={{ scale: 0.04, opacity: 0, y: -190, rotate: 0 }}
-                style={{
-                  position: 'absolute',
-                  top: 0, left: '50%', marginLeft: -48,
-                  zIndex: 30,
-                  transformOrigin: 'center bottom',
-                }}
-              >
-                <MedievalKey progress={progress} />
-              </motion.div>
-
-              {/* Keyhole plate (static, centered) */}
-              <div style={{ position: 'relative', zIndex: 10, marginTop: 90 }}>
-                <KeyholeHole />
-              </div>
-            </div>
-          </div>
-
-          {/* ── Instructions & progress ── */}
-          <motion.div
-            className="absolute bottom-16 flex flex-col items-center gap-4"
-            animate={phase === 'unlocking' ? { opacity: 0, y: 8 } : { opacity: 1, y: 0 }}
-            transition={{ duration: 0.35 }}
-          >
-            <motion.p
-              key={taps}
-              initial={{ opacity: 0, y: -5 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.25 }}
-              className="font-sans text-[11px] tracking-[0.32em] uppercase"
-              style={{ color: 'rgba(196,114,138,0.7)' }}
+          {/* Floating hearts */}
+          {[15, 35, 65, 82].map((left, i) => (
+            <motion.div key={i}
+              className="absolute pointer-events-none text-lg"
+              style={{ left: `${left}%`, top: `${20 + i * 15}%`, opacity: 0.18 }}
+              animate={{ y: [0, -16, 0], opacity: [0.14, 0.28, 0.14] }}
+              transition={{ duration: 3 + i * 0.7, repeat: Infinity, delay: i * 0.5 }}
             >
-              {taps === 0
-                ? 'Tap anywhere to unlock'
-                : taps >= TOTAL_TAPS
-                  ? 'Opening…'
-                  : `${TOTAL_TAPS - taps} tap${TOTAL_TAPS - taps !== 1 ? 's' : ''} remaining`}
+              ♥
+            </motion.div>
+          ))}
+
+          {/* ── Title ── */}
+          <motion.div
+            className="text-center mb-5 z-10 px-4"
+            initial={{ opacity: 0, y: -18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.25 }}
+          >
+            <AnimatePresence mode="wait">
+              <motion.h1
+                key={allDone ? 'done' : 'wish'}
+                className="font-script mb-1"
+                style={{
+                  fontSize: 'clamp(2rem, 8vw, 3.2rem)',
+                  color: '#F5D0DC',
+                  textShadow: '0 0 30px rgba(196,114,138,0.45)',
+                }}
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 8 }}
+                transition={{ duration: 0.4 }}
+              >
+                {allDone ? '✨ Wish Granted!' : 'Make a Wish, Angel!'}
+              </motion.h1>
+            </AnimatePresence>
+
+            <motion.p
+              key={blownCount}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+              className="font-sans text-[11px] tracking-[0.28em] uppercase"
+              style={{ color: 'rgba(196,114,138,0.6)' }}
+            >
+              {allDone
+                ? 'Opening your surprise…'
+                : blownCount === 0
+                  ? 'Tap a candle to blow it out'
+                  : `${CANDLES.length - blownCount} candle${CANDLES.length - blownCount !== 1 ? 's' : ''} left`}
             </motion.p>
-            <TapProgress taps={taps} />
           </motion.div>
 
-          {/* ── Fade-out overlay ── */}
+          {/* ── CAKE SVG ── */}
+          <motion.div
+            className="relative z-10"
+            initial={{ opacity: 0, scale: 0.82, y: 32 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            style={{ width: 'min(400px, 92vw)' }}
+          >
+            <svg
+              viewBox="0 0 400 320"
+              style={{ width: '100%', height: 'auto', overflow: 'visible' }}
+            >
+              <defs>
+                {/* Flame gradients */}
+                <linearGradient id="fl_outer" x1="0" y1="1" x2="0" y2="0">
+                  <stop offset="0%"   stopColor="#FF5500" />
+                  <stop offset="45%"  stopColor="#FF8C00" />
+                  <stop offset="80%"  stopColor="#FFC400" />
+                  <stop offset="100%" stopColor="#FFF0A0" />
+                </linearGradient>
+                <linearGradient id="fl_mid" x1="0" y1="1" x2="0" y2="0">
+                  <stop offset="0%"   stopColor="#FF7700" />
+                  <stop offset="50%"  stopColor="#FFBB00" />
+                  <stop offset="100%" stopColor="#FFF4B0" />
+                </linearGradient>
+
+                {/* Tier gradients */}
+                <linearGradient id="t1" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%"   stopColor="#C06080" />
+                  <stop offset="50%"  stopColor="#A05068" />
+                  <stop offset="100%" stopColor="#7A3850" />
+                </linearGradient>
+                <linearGradient id="t2" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%"   stopColor="#D880A0" />
+                  <stop offset="50%"  stopColor="#B86080" />
+                  <stop offset="100%" stopColor="#8C4060" />
+                </linearGradient>
+                <linearGradient id="frost" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%"   stopColor="#FFF5F8" />
+                  <stop offset="100%" stopColor="#F8D8E4" />
+                </linearGradient>
+                <linearGradient id="plate" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%"   stopColor="#3A1520" />
+                  <stop offset="100%" stopColor="#1A0810" />
+                </linearGradient>
+                <linearGradient id="cakeGlow" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%"   stopColor="rgba(240,168,190,0.18)" />
+                  <stop offset="100%" stopColor="rgba(196,114,138,0)" />
+                </linearGradient>
+
+                {/* Drop shadow filter */}
+                <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="6" stdDeviation="10" floodColor="rgba(0,0,0,0.55)" />
+                </filter>
+                <filter id="candleShadow">
+                  <feDropShadow dx="0" dy="2" stdDeviation="4" floodColor="rgba(0,0,0,0.4)" />
+                </filter>
+                <filter id="flameGlow">
+                  <feGaussianBlur stdDeviation="3" result="blur" />
+                  <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+                </filter>
+              </defs>
+
+              {/* ── Ambient glow under cake ── */}
+              <ellipse cx="200" cy="310" rx="180" ry="20"
+                fill="rgba(196,114,138,0.12)" />
+
+              {/* ── Cake plate ── */}
+              <rect x="5" y="297" width="390" height="18" rx="8"
+                fill="url(#plate)" />
+              <rect x="5" y="297" width="390" height="4" rx="4"
+                fill="rgba(255,180,200,0.1)" />
+
+              {/* ── BOTTOM TIER ── */}
+              <rect x="14" y="218" width="372" height="79" rx="16"
+                fill="url(#t1)" filter="url(#shadow)" />
+              {/* Highlight stripe */}
+              <rect x="14" y="218" width="372" height="5" rx="5"
+                fill="rgba(255,210,225,0.22)" />
+              {/* Side highlight */}
+              <rect x="14" y="218" width="6" height="79" rx="3"
+                fill="rgba(255,200,220,0.1)" />
+
+              {/* Bottom tier frosting drips */}
+              {[38,72,108,145,182,218,255,292,330,366].map((x, i) => {
+                const h = 10 + [6,12,8,14,6,10,14,8,12,6][i];
+                return (
+                  <g key={x}>
+                    <rect x={x-9} y={216} width={18} height={h+3} rx={9} fill="url(#frost)" />
+                    <ellipse cx={x} cy={216+h+3} rx={9} ry={6.5} fill="url(#frost)" />
+                  </g>
+                );
+              })}
+
+              {/* Bottom tier decor: dots */}
+              {[50,100,150,200,250,300,350].map((x, i) => (
+                <circle key={x} cx={x} cy={256} r={4.5}
+                  fill={i%2===0 ? 'rgba(255,210,228,0.65)' : 'rgba(210,180,242,0.65)'} />
+              ))}
+              {/* Stars */}
+              {[75,175,275,370].map((x, i) => (
+                <text key={x} x={x} y={270} textAnchor="middle"
+                  fontSize="11" fill="rgba(255,220,232,0.45)">★</text>
+              ))}
+              {/* Hearts */}
+              {[125,225,325].map((x) => (
+                <text key={x} x={x} y={270} textAnchor="middle"
+                  fontSize="10" fill="rgba(255,200,220,0.5)">♥</text>
+              ))}
+
+              {/* ── TOP TIER ── */}
+              <rect x="68" y="144" width="264" height="74" rx="13"
+                fill="url(#t2)" filter="url(#shadow)" />
+              {/* Highlight */}
+              <rect x="68" y="144" width="264" height="5" rx="5"
+                fill="rgba(255,220,235,0.25)" />
+              <rect x="68" y="144" width="6" height="74" rx="3"
+                fill="rgba(255,210,225,0.1)" />
+
+              {/* Top tier frosting drips */}
+              {[88,118,150,182,218,254,286,318].map((x, i) => {
+                const h = 8 + [5,10,7,12,6,9,11,7][i];
+                return (
+                  <g key={x}>
+                    <rect x={x-8} y={142} width={16} height={h+3} rx={8} fill="url(#frost)" />
+                    <ellipse cx={x} cy={142+h+3} rx={8} ry={5.5} fill="url(#frost)" />
+                  </g>
+                );
+              })}
+
+              {/* Top tier decor */}
+              {[100,150,200,250,300].map((x, i) => (
+                <circle key={x} cx={x} cy={178} r={3.5}
+                  fill={i%2===0 ? 'rgba(255,210,228,0.6)' : 'rgba(200,175,242,0.6)'} />
+              ))}
+
+              {/* "Angel" script on top tier */}
+              <text x="200" y="196" textAnchor="middle"
+                fontFamily="'Sacramento', cursive" fontSize="28"
+                fill="rgba(255,225,235,0.7)" style={{ userSelect: 'none' }}>
+                Angel
+              </text>
+
+              {/* ── CANDLES ── */}
+              {CANDLES.map(c => {
+                const isBlown = blown[c.id];
+                return (
+                  <g key={c.id}
+                    onClick={() => blowCandle(c.id)}
+                    style={{ cursor: isBlown ? 'default' : 'pointer' }}
+                  >
+                    {/* Large hit area */}
+                    <rect x={c.x-24} y={28} width={48} height={120} fill="transparent" />
+
+                    {/* Candle body */}
+                    <rect x={c.x-8} y={CANDLE_TOP_Y} width={16} height={CANDLE_BTM_Y - CANDLE_TOP_Y}
+                      rx={5} fill={c.color} filter="url(#candleShadow)" />
+
+                    {/* Shine */}
+                    <rect x={c.x-5} y={CANDLE_TOP_Y + 5} width={3.5}
+                      height={CANDLE_BTM_Y - CANDLE_TOP_Y - 14} rx={1.75}
+                      fill="rgba(255,255,255,0.25)" />
+
+                    {/* Wax drip at candle base */}
+                    <ellipse cx={c.x} cy={CANDLE_BTM_Y} rx={9} ry={3.5}
+                      fill={c.shine} opacity={0.35} />
+
+                    {/* Wick */}
+                    <line x1={c.x} y1={CANDLE_TOP_Y} x2={c.x} y2={WICK_TOP_Y}
+                      stroke="#3A1825" strokeWidth={2.2} strokeLinecap="round" />
+
+                    {/* Wick tip / ember */}
+                    <circle cx={c.x} cy={WICK_TOP_Y} r={2.5}
+                      fill={isBlown ? '#3A1825' : '#FF6000'}
+                      style={{
+                        filter: isBlown ? 'none' : 'drop-shadow(0 0 4px rgba(255,140,0,0.9))',
+                      }}
+                    />
+
+                    {/* Flame (animated) */}
+                    {!isBlown && (
+                      <g transform={`translate(${c.x}, ${WICK_TOP_Y})`}
+                        filter="url(#flameGlow)">
+                        <Flame seed={c.id} />
+                      </g>
+                    )}
+
+                    {/* Smoke puff on blow */}
+                    {smokeIds.includes(c.id) && <SmokePuff cx={c.x} />}
+
+                    {/* Spark burst on blow */}
+                    {sparkIds.includes(c.id) && <SparkBurst cx={c.x} />}
+
+                    {/* Blown-out indicator (subtle ring) */}
+                    {isBlown && (
+                      <motion.circle
+                        cx={c.x} cy={WICK_TOP_Y} r={6}
+                        fill="none"
+                        stroke="rgba(196,114,138,0.3)"
+                        strokeWidth={1}
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ duration: 0.3 }}
+                      />
+                    )}
+                  </g>
+                );
+              })}
+            </svg>
+          </motion.div>
+
+          {/* ── All blown celebration ── */}
           <AnimatePresence>
-            {phase === 'unlocking' && (
-              <motion.div
-                key="flash"
-                className="absolute inset-0 pointer-events-none"
-                style={{ background: 'radial-gradient(ellipse at 50% 48%, rgba(240,168,190,0.18) 0%, rgba(0,0,0,0) 65%)' }}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: [0, 0.9, 0] }}
-                transition={{ duration: 0.8, times: [0, 0.2, 1] }}
-              />
+            {phase === 'allBlown' && (
+              <>
+                <ConfettiBurst />
+                <motion.div
+                  key="celebration"
+                  className="absolute bottom-14 text-center z-20"
+                  initial={{ opacity: 0, scale: 0.65, y: 24 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ type: 'spring', stiffness: 220, damping: 16 }}
+                >
+                  <p className="font-serif text-xl md:text-2xl"
+                    style={{ color: '#F5D0DC', textShadow: '0 0 20px rgba(196,114,138,0.5)' }}>
+                    🎂 Happy Birthday, Angel! 🎂
+                  </p>
+                </motion.div>
+              </>
             )}
           </AnimatePresence>
+
+          {/* ── Tap hint when no candles blown ── */}
+          {blownCount === 0 && (
+            <motion.div
+              className="absolute bottom-10 z-10 flex flex-col items-center gap-2"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.2 }}
+            >
+              <motion.div
+                animate={{ y: [0, -5, 0] }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+                style={{ color: 'rgba(196,114,138,0.5)', fontSize: 20 }}
+              >
+                ↑
+              </motion.div>
+              <p className="font-sans text-[10px] tracking-[0.3em] uppercase"
+                style={{ color: 'rgba(196,114,138,0.4)' }}>
+                tap the flames
+              </p>
+            </motion.div>
+          )}
         </motion.div>
-      ) : (
-        /* Final black-fade exit */
-        <motion.div
-          key="exit"
-          className="fixed inset-0 z-[9999] pointer-events-none"
-          style={{ background: '#060203' }}
-          initial={{ opacity: 1 }}
-          animate={{ opacity: 0 }}
-          transition={{ duration: 1.0, ease: 'easeInOut' }}
-        />
       )}
     </AnimatePresence>
   );
