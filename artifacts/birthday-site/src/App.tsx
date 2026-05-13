@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Switch, Route, Router as WouterRouter } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -7,6 +8,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { AnimatedBackground } from "./components/AnimatedBackground";
 import { TimelineSector } from "./components/TimelineSector";
 import { FloatingBalloons, ConfettiBurst, Sparkles } from "./components/Sparkles";
+import { IntroLock } from "./components/IntroLock";
 
 const queryClient = new QueryClient();
 
@@ -427,9 +429,12 @@ function Router() {
 }
 
 function App() {
+  const [unlocked, setUnlocked] = useState(false);
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
+        {!unlocked && <IntroLock onUnlocked={() => setUnlocked(true)} />}
         <WouterRouter base={import.meta.env.BASE_URL?.replace(/\/$/, "") || ""}>
           <Router />
         </WouterRouter>
