@@ -360,8 +360,8 @@ function Home() {
               You are a treasure beyond measure, AJ.
             </p>
             <p className="text-sm md:text-base leading-relaxed mb-14 max-w-md mx-auto font-sans" style={{ color: 'rgba(240,168,190,0.5)' }}>
-              The world wont be f_n wihtout "u", how would i la_gh without "u".
-              thank you for being the most wonderful person in the world, and for being you. My dearest friend, my sunshine. 
+              The World Wont Be F_N Without "U", How Would I LA_GH Without "U".
+              Thank You For Being The Most Wonderful Person In The World, And For Being You. My Dearest Friend, My Sunshine. 
               </p>
 
             <RoseDivider />
@@ -382,7 +382,7 @@ function Home() {
                 filter: 'drop-shadow(0 2px 16px rgba(196,114,138,0.5))',
               }}
             >
-              Happy Birthday, Angel!
+              A Very Happy Birthday, Angel!
             </motion.div>
 
             <motion.div
@@ -409,7 +409,7 @@ function Home() {
               className="mt-8"
             >
               <span className="font-script text-3xl" style={{ color: 'rgba(196,114,138,0.6)' }}>
-                with all our love for AJ
+                with all love for AJ
               </span>
             </motion.div>
           </motion.div>
