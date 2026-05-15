@@ -14,23 +14,23 @@ const queryClient = new QueryClient();
 
 const CHAPTERS = [
   { label: "Memory", title: "From the Very Start", description: "From the moment you arrived, the world became a brighter, softer place. You were magic from day one, Angel." },
-  { label: "Chapter", title: "First Smile", description: "That smile of yours — the one that lights up every room — made its debut and nobody has been the same since." },
-  { label: "Year", title: "Growing So Gracefully", description: "Every step you took, every word you spoke — full of the grace and light that only AJ could carry." },
+  { label: "Memory", title: "First Smile", description: "That smile of yours — the one that lights up every room — made its debut and nobody has been the same since." },
+  { label: "Memory", title: "Growing So Gracefully", description: "Every step you took, every word you spoke — full of the grace and light that only AJ could carry." },
   { label: "Memory", title: "Shared Giggles", description: "Laughing until it hurt. The kind of joy that stays with you long after the moment fades." },
-  { label: "Chapter", title: "Unexpected Sparkle", description: "You have this way of finding magic in ordinary moments. Only Angel could see the world quite like that." },
-  { label: "Year", title: "Finding Her Wings", description: "Brave, bold, and beautifully herself — AJ spreading her wings and owning every moment." },
+  { label: "Memory", title: "Unexpected Sparkle", description: "You have this way of finding magic in ordinary moments. Only Angel could see the world quite like that." },
+  { label: "Memory", title: "Finding Her Wings", description: "Brave, bold, and beautifully herself — AJ spreading her wings and owning every moment." },
   { label: "Memory", title: "Quiet Mornings", description: "Soft light, warm tea, and that peaceful look on your face. Cherished moments just like you." },
-  { label: "Chapter", title: "Dancing Through Life", description: "You move through life like a song — effortlessly, joyfully, and always in perfect rhythm." },
-  { label: "Year", title: "New Adventures", description: "Each new horizon she met with sparkling eyes and an open heart. That courage is so uniquely Angel." },
+  { label: "Memory", title: "Dancing Through Life", description: "You move through life like a song — effortlessly, joyfully, and always in perfect rhythm." },
+  { label: "Memory", title: "New Adventures", description: "Each new horizon she met with sparkling eyes and an open heart. That courage is so uniquely Angel." },
   { label: "Memory", title: "Warm Hugs", description: "A hug from you feels like coming home. Safe, warm, and full of love — just like you always are." },
-  { label: "Chapter", title: "Glowing in the Rain", description: "Even on cloudy days, AJ managed to shine. That light of yours cannot be dimmed by anything." },
-  { label: "Year", title: "Late Night Dreams", description: "Talking about everything and nothing. The conversations that stitched hearts closer together." },
+  { label: "Memory", title: "Glowing in the Rain", description: "Even on cloudy days, AJ managed to shine. That light of yours cannot be dimmed by anything." },
+  { label: "Memory", title: "Late Night Dreams", description: "Talking about everything and nothing. The conversations that stitched hearts closer together." },
   { label: "Memory", title: "Golden Sunsets", description: "Watching the sky blush pink and gold — the perfect backdrop for someone as beautiful as you." },
-  { label: "Chapter", title: "Her Spark of Brilliance", description: "That moment when Angel's eyes lit up with an idea. Pure genius wrapped in the sweetest soul." },
-  { label: "Year", title: "Quiet Strength", description: "Soft as petals, strong as roses. AJ's resilience is one of the most beautiful things about her." },
+  { label: "Memory", title: "Her Spark of Brilliance", description: "That moment when Angel's eyes lit up with an idea. Pure genius wrapped in the sweetest soul." },
+  { label: "Memory", title: "Quiet Strength", description: "Soft as petals, strong as roses. AJ's resilience is one of the most beautiful things about her." },
   { label: "Memory", title: "Every Win Celebrated", description: "Every achievement, big or small, celebrated with the enthusiasm only Angel deserves." },
-  { label: "Chapter", title: "A Song for AJ", description: "If your life were a melody, it would be the most beautiful thing anyone has ever heard." },
-  { label: "Year", title: "Right Here, Right Now", description: "Today, looking at you — full of grace and love and light — we are so grateful for every day with Angel." },
+  { label: "Memory", title: "A Song for AJ", description: "If your life were a melody, it would be the most beautiful thing anyone has ever heard." },
+  { label: "Memory", title: "Right Here, Right Now", description: "Today, looking at you — full of grace and love and light — we are so grateful for every day with Angel." },
 ];
 
 function HeartIcon({ size = 28 }: { size?: number }) {
@@ -142,7 +142,7 @@ function Home() {
             >
               <FeminineFloral />
               <span className="text-[10px] md:text-xs font-sans font-semibold tracking-[0.38em] uppercase" style={{ color: '#C4728A' }}>
-                For You, Angel
+                For You, MiLady
               </span>
               <FeminineFloral flip />
             </motion.div>
@@ -219,7 +219,7 @@ function Home() {
                 <svg width="10" height="9" viewBox="0 0 20 18" fill="#F0A8BE">
                   <path d="M10 0 C10 0 0 6 0 11 C0 15 4.5 18 10 18 C15.5 18 20 15 20 11 C20 6 10 0 10 0Z" />
                 </svg>
-                always & forever AJ
+                always cheering for you AJ
                 <svg width="10" height="9" viewBox="0 0 20 18" fill="#F0A8BE">
                   <path d="M10 0 C10 0 0 6 0 11 C0 15 4.5 18 10 18 C15.5 18 20 15 20 11 C20 6 10 0 10 0Z" />
                 </svg>
@@ -234,7 +234,7 @@ function Home() {
               className="font-sans text-sm md:text-base tracking-[0.15em] mt-5 max-w-sm mx-auto"
               style={{ color: 'rgba(196,114,138,0.65)' }}
             >
-              Every year is a new chapter of your beautiful story
+              Every year is a new chapter of your fascinating story
             </motion.p>
 
             {/* Scroll line */}
@@ -267,7 +267,7 @@ function Home() {
         >
           <RoseDivider />
           <p className="text-xs md:text-sm tracking-[0.3em] uppercase font-sans my-4" style={{ color: 'rgba(196,114,138,0.45)' }}>
-            Memories made with Angel
+            Weaving the beautiful memories
           </p>
           <RoseDivider />
         </motion.section>
@@ -357,12 +357,12 @@ function Home() {
 
             <p className="text-base md:text-xl leading-relaxed mb-5 max-w-lg mx-auto font-sans" style={{ color: 'rgba(196,114,138,0.65)' }}>
               May every day bring you the joy you so effortlessly give to everyone around you.
-              You are cherished more than words can say, AJ.
+              You are a treasure beyond measure, AJ.
             </p>
             <p className="text-sm md:text-base leading-relaxed mb-14 max-w-md mx-auto font-sans" style={{ color: 'rgba(240,168,190,0.5)' }}>
-              The world is more beautiful, more gentle, and more full of love
-              simply because Angel is in it.
-            </p>
+              The world wont be f_n wihtout "u", how would i la_gh without "u".
+              thank you for being the most wonderful person in the world, and for being you. My dearest friend, my sunshine. 
+              </p>
 
             <RoseDivider />
 
