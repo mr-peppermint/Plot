@@ -297,7 +297,7 @@ function Home() {
         </section>
 
         {/* ── CLOSING ── */}
-        <section className="w-full min-h-[90dvh] flex flex-col items-center justify-center p-6 text-center relative overflow-hidden">
+        <section className="w-full min-h-[90dvh] flex flex-col items-center justify-center p-6 pb-24 text-center relative overflow-x-hidden">
           <FloatingBalloons count={6} />
           <ConfettiBurst />
           <Sparkles count={30} colors={['#F0A8BE', '#C4728A', '#CDB8F0', '#9B7FC8', '#F5D0DC', '#B89CD8', '#FFD6E4']} />
