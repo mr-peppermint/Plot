@@ -97,7 +97,7 @@ function Home() {
   const heroY = useTransform(scrollYProgress, [0, 0.18], [0, -50]);
 
   return (
-    <div className="relative min-h-screen w-full bg-gradient-dynamic overflow-hidden">
+    <div className="relative min-h-screen w-full bg-gradient-dynamic overflow-x-hidden">
       <AnimatedBackground />
 
       <div
