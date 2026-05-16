@@ -434,7 +434,7 @@ export function IntroLock({ onUnlocked, onMusicReady }: {
               <text x="200" y="400" textAnchor="middle"
                 fontFamily="'Sacramento', cursive" fontSize="36"
                 fill="rgba(255,225,235,0.7)" style={{ userSelect: 'none' }}>
-                Happy 18th Birthday!
+                Happy 18th
               </text>
 
               {CANDLES.map(c => {
