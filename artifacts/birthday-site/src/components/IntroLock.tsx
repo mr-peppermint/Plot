@@ -432,9 +432,9 @@ export function IntroLock({ onUnlocked, onMusicReady }: {
                   fill={i%2===0 ? 'rgba(255,210,228,0.6)' : 'rgba(200,175,242,0.6)'} />
               ))}
               <text x="200" y="196" textAnchor="middle"
-                fontFamily="'Sacramento', cursive" fontSize="28"
+                fontFamily="'Sacramento', cursive" fontSize="26"
                 fill="rgba(255,225,235,0.7)" style={{ userSelect: 'none' }}>
-                Angel
+                Happy 18th Birthday!
               </text>
 
               {CANDLES.map(c => {
