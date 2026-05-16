@@ -431,7 +431,7 @@ export function IntroLock({ onUnlocked, onMusicReady }: {
                 <circle key={x} cx={x} cy={178} r={3.5}
                   fill={i%2===0 ? 'rgba(255,210,228,0.6)' : 'rgba(200,175,242,0.6)'} />
               ))}
-              <text x="200" y="196" textAnchor="middle"
+              <text x="200" y="176" textAnchor="middle"
                 fontFamily="'Sacramento', cursive" fontSize="26"
                 fill="rgba(255,225,235,0.7)" style={{ userSelect: 'none' }}>
                 Happy 18th Birthday!
