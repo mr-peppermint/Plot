@@ -1,59 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-/* ── Music Engine (Web Audio API) ───────────────── */
-const BEAT = 60 / 76; // seconds per beat at 76 BPM
-
-// Pentatonic-major melody — sweet & looping
-const MELODY: [number, number][] = [
-  // Bar 1 — G5 E5 C5 E5
-  [784.00, BEAT], [659.25, BEAT], [523.25, BEAT], [659.25, BEAT],
-  // Bar 2 — A4 C5 E5 C5
-  [440.00, BEAT], [523.25, BEAT], [659.25, BEAT], [523.25, BEAT],
-  // Bar 3 — G4 A4 C5 A4
-  [392.00, BEAT], [440.00, BEAT], [523.25, BEAT], [440.00, BEAT],
-  // Bar 4 — G4 hold
-  [392.00, BEAT * 4],
-  // Bar 5 — E5 G5 A5 G5
-  [659.25, BEAT], [784.00, BEAT], [880.00, BEAT], [784.00, BEAT],
-  // Bar 6 — E5 C5 G4 A4
-  [659.25, BEAT], [523.25, BEAT], [392.00, BEAT], [440.00, BEAT],
-  // Bar 7 — C5 E5 G5 E5
-  [523.25, BEAT], [659.25, BEAT], [784.00, BEAT], [659.25, BEAT],
-  // Bar 8 — C5 hold
-  [523.25, BEAT * 4],
-];
-
-const LOOP_DUR = MELODY.reduce((s, [, d]) => s + d, 0);
-
-function scheduleLoop(ctx: AudioContext, master: GainNode, t0: number) {
-  let t = t0;
-  for (const [freq, dur] of MELODY) {
-    if (freq > 0) {
-      const osc  = ctx.createOscillator();
-      const env  = ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, t);
-      env.gain.setValueAtTime(0, t);
-      env.gain.linearRampToValueAtTime(0.85, t + 0.013);
-      env.gain.exponentialRampToValueAtTime(0.001, t + Math.min(dur * 0.75, 0.5));
-      osc.connect(env); env.connect(master);
-      osc.start(t); osc.stop(t + dur);
-
-      const osc2  = ctx.createOscillator();
-      const env2  = ctx.createGain();
-      osc2.type = 'sine';
-      osc2.frequency.setValueAtTime(freq * 2, t);
-      env2.gain.setValueAtTime(0, t);
-      env2.gain.linearRampToValueAtTime(0.12, t + 0.013);
-      env2.gain.exponentialRampToValueAtTime(0.001, t + Math.min(dur * 0.5, 0.25));
-      osc2.connect(env2); env2.connect(master);
-      osc2.start(t); osc2.stop(t + dur);
-    }
-    t += dur;
-  }
-}
-
 /* ── Candle config ─────────────────────────────── */
 const CANDLES = [
   { id: 0, x: 108, color: '#F0A8BE', shine: '#FFE4EE' },
@@ -63,9 +10,9 @@ const CANDLES = [
   { id: 4, x: 292, color: '#F0A8BE', shine: '#FFE4EE' },
 ];
 
-const WICK_TOP_Y    = 74;
-const CANDLE_TOP_Y  = 84;
-const CANDLE_BTM_Y  = 144;
+const WICK_TOP_Y   = 74;
+const CANDLE_TOP_Y = 84;
+const CANDLE_BTM_Y = 144;
 
 /* ── Animated Flame ────────────────────────────── */
 function Flame({ seed }: { seed: number }) {
@@ -93,11 +40,11 @@ function Flame({ seed }: { seed: number }) {
 /* ── Smoke puff after blow ─────────────────────── */
 function SmokePuff({ cx }: { cx: number }) {
   const puffs = [
-    { dx: 0,   sz: 2,   delay: 0    },
-    { dx: -4,  sz: 2.5, delay: 0.12 },
-    { dx: 4,   sz: 2.2, delay: 0.22 },
-    { dx: -2,  sz: 3,   delay: 0.36 },
-    { dx: 3,   sz: 2.4, delay: 0.48 },
+    { dx: 0,  sz: 2,   delay: 0    },
+    { dx: -4, sz: 2.5, delay: 0.12 },
+    { dx: 4,  sz: 2.2, delay: 0.22 },
+    { dx: -2, sz: 3,   delay: 0.36 },
+    { dx: 3,  sz: 2.4, delay: 0.48 },
   ];
   return (
     <>
@@ -153,7 +100,7 @@ function SparkBurst({ cx }: { cx: number }) {
   );
 }
 
-/* ── Confetti burst (DOM layer) on all blown ───── */
+/* ── Confetti burst ─────────────────────────────── */
 function ConfettiBurst() {
   const pieces = Array.from({ length: 40 }, (_, i) => ({
     id: i,
@@ -180,8 +127,7 @@ function ConfettiBurst() {
           {p.shape === 1 && <div style={{ width: 12, height: 5, background: p.color }} />}
           {p.shape === 2 && (
             <svg width="10" height="9" viewBox="0 0 20 18">
-              <path d="M10 0 C10 0 0 6 0 11 C0 15 4.5 18 10 18 C15.5 18 20 15 20 11 C20 6 10 0 10 0Z"
-                fill={p.color} />
+              <path d="M10 0 C10 0 0 6 0 11 C0 15 4.5 18 10 18 C15.5 18 20 15 20 11 C20 6 10 0 10 0Z" fill={p.color} />
             </svg>
           )}
         </motion.div>
@@ -201,70 +147,110 @@ export function IntroLock({ onUnlocked, onMusicReady }: {
   const [phase, setPhase]       = useState<'active' | 'allBlown' | 'exit'>('active');
   const [muted, setMuted]       = useState(false);
   const doneRef                 = useRef(false);
-  const ctxRef                  = useRef<AudioContext | null>(null);
-  const stopMusicRef            = useRef<(() => void) | null>(null);
+  const audioRef                = useRef<HTMLAudioElement | null>(null);
   const mutedRef                = useRef(false);
-  const masterVolRef            = useRef<GainNode | null>(null);
+  const fadeTimerRef            = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  /* ── Fade utilities ── */
+  const clearFade = () => {
+    if (fadeTimerRef.current) {
+      clearInterval(fadeTimerRef.current);
+      fadeTimerRef.current = null;
+    }
+  };
+
+  const fadeIn = (audio: HTMLAudioElement, targetVol = 0.5, durationMs = 3000) => {
+    clearFade();
+    audio.volume = 0;
+    const steps    = 80;
+    const stepTime = durationMs / steps;
+    const stepVol  = targetVol / steps;
+    fadeTimerRef.current = setInterval(() => {
+      if (!audio) { clearFade(); return; }
+      const next = Math.min(audio.volume + stepVol, targetVol);
+      audio.volume = next;
+      if (next >= targetVol) clearFade();
+    }, stepTime);
+  };
+
+  const fadeOut = (audio: HTMLAudioElement, durationMs = 1800) => {
+    clearFade();
+    const startVol = audio.volume;
+    const steps    = 80;
+    const stepTime = durationMs / steps;
+    const stepVol  = startVol / steps;
+    fadeTimerRef.current = setInterval(() => {
+      if (!audio) { clearFade(); return; }
+      const next = Math.max(audio.volume - stepVol, 0);
+      audio.volume = next;
+      if (next <= 0) {
+        clearFade();
+        audio.pause();
+      }
+    }, stepTime);
+  };
+
+  /* ── Boot audio ── */
   useEffect(() => {
-    let ctx: AudioContext | null = null;
-    let stopped = false;
+    // 🎵 Place your music file at: artifacts/birthday-site/public/music.mp3
+    const audio = new Audio(import.meta.env.BASE_URL + 'music.mp3');
+    audio.loop   = true;
+    audio.volume = 0;
+    audioRef.current = audio;
 
-    const boot = async () => {
-      if (ctxRef.current) return;
-      ctx = new AudioContext();
-      ctxRef.current = ctx;
-      const muteGate = ctx.createGain();
-      muteGate.gain.value = 1;
-      masterVolRef.current = muteGate;
-      muteGate.connect(ctx.destination);
-      if (ctx.state === 'suspended') await ctx.resume();
-      if (stopped) return;
-      const master = ctx.createGain();
-      master.gain.setValueAtTime(0, ctx.currentTime);
-      master.gain.linearRampToValueAtTime(0.22, ctx.currentTime + 3);
-      master.connect(muteGate);
-      let active = true;
-      const loop = (startAt: number) => {
-        if (!active) return;
-        scheduleLoop(ctx!, master, startAt);
-        setTimeout(() => loop(startAt + LOOP_DUR), (LOOP_DUR - 2) * 1000);
-      };
-      loop(ctx.currentTime + 0.4);
-      stopMusicRef.current = () => {
-        active = false;
-        const now = ctx!.currentTime;
-        master.gain.setValueAtTime(master.gain.value, now);
-        master.gain.linearRampToValueAtTime(0, now + 1.8);
-      };
-      // ✅ Pass stop function up AFTER it's created, inside boot()
-      onMusicReady?.(stopMusicRef.current);
+    const start = () => {
+      audio.play()
+        .then(() => fadeIn(audio, 0.5, 3000))
+        .catch(() => {
+          // Autoplay blocked on mobile — wait for first tap
+        });
     };
 
-    boot();
-    const onTouch = () => boot();
-    document.addEventListener('pointerdown', onTouch, { once: true });
+    // Try immediately (works on desktop)
+    start();
+
+    // Retry on first user interaction (required on mobile)
+    const onFirstTouch = () => {
+      if (audio.paused) start();
+    };
+    document.addEventListener('pointerdown', onFirstTouch, { once: true });
+
+    // Give App.tsx a handle to stop the music later from the main page
+    const stopFn = () => {
+      if (audioRef.current) fadeOut(audioRef.current, 1800);
+    };
+    onMusicReady?.(stopFn);
 
     return () => {
-      stopped = true;
-      document.removeEventListener('pointerdown', onTouch);
-      // ✅ Do NOT stop music here — let it continue into the main page
-      setTimeout(() => ctx?.close(), 2200);
+      document.removeEventListener('pointerdown', onFirstTouch);
+      clearFade();
+      // ✅ Do NOT stop music here — it continues playing on the main page
     };
   }, []);
 
+  /* ── Mute / unmute ── */
   const toggleMute = useCallback(() => {
     mutedRef.current = !mutedRef.current;
     setMuted(mutedRef.current);
-    if (masterVolRef.current && ctxRef.current) {
-      masterVolRef.current.gain.setTargetAtTime(
-        mutedRef.current ? 0 : 1,
-        ctxRef.current.currentTime,
-        0.1,
-      );
+    if (audioRef.current) {
+      // Smooth volume ramp instead of hard cut
+      const target = mutedRef.current ? 0 : 0.5;
+      const audio  = audioRef.current;
+      clearFade();
+      const steps    = 20;
+      const stepTime = 150 / steps;
+      const diff     = (target - audio.volume) / steps;
+      fadeTimerRef.current = setInterval(() => {
+        const next = Math.min(Math.max(audio.volume + diff, 0), 0.5);
+        audio.volume = next;
+        if (next === target || (diff > 0 && next >= target) || (diff < 0 && next <= target)) {
+          clearFade();
+        }
+      }, stepTime);
     }
   }, []);
 
+  /* ── Blow a candle ── */
   const blowCandle = useCallback((id: number) => {
     if (blown[id] || phase !== 'active') return;
 
@@ -279,7 +265,7 @@ export function IntroLock({ onUnlocked, onMusicReady }: {
       if (next.every(Boolean) && !doneRef.current) {
         doneRef.current = true;
         setTimeout(() => setPhase('allBlown'), 300);
-        // ✅ Removed: stopMusicRef.current?.() — music continues to main page
+        // ✅ Music keeps playing into the main page — no stop call here
         setTimeout(() => setPhase('exit'), 2400);
         setTimeout(() => onUnlocked(), 3300);
       }
@@ -301,6 +287,7 @@ export function IntroLock({ onUnlocked, onMusicReady }: {
           exit={{ opacity: 0, scale: 1.04 }}
           transition={{ duration: 1.1, ease: 'easeInOut' }}
         >
+
           {/* Mute button */}
           <motion.button
             onClick={toggleMute}
@@ -321,7 +308,7 @@ export function IntroLock({ onUnlocked, onMusicReady }: {
             {muted ? '🔇' : '🎵'}
           </motion.button>
 
-          {/* Floating star field */}
+          {/* Star field */}
           {Array.from({ length: 55 }, (_, i) => (
             <motion.div key={i}
               className="absolute rounded-full pointer-events-none"
@@ -330,7 +317,7 @@ export function IntroLock({ onUnlocked, onMusicReady }: {
                 height: 1 + (i % 3) * 0.8,
                 left: `${(i * 13.7) % 100}%`,
                 top: `${(i * 17.3) % 100}%`,
-                background: ['rgba(240,168,190,','rgba(196,114,138,','rgba(184,156,216,'][i%3]
+                background: ['rgba(240,168,190,','rgba(196,114,138,','rgba(184,156,216,'][i % 3]
                   + `${0.25 + (i % 4) * 0.12})`,
               }}
               animate={{ opacity: [0.1, 0.85, 0.1] }}
@@ -350,7 +337,7 @@ export function IntroLock({ onUnlocked, onMusicReady }: {
             </motion.div>
           ))}
 
-          {/* ── CAKE SVG ── */}
+          {/* Cake SVG */}
           <motion.div
             className="relative z-10"
             initial={{ opacity: 0, scale: 0.82, y: 32 }}
@@ -358,10 +345,7 @@ export function IntroLock({ onUnlocked, onMusicReady }: {
             transition={{ duration: 1, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
             style={{ width: 'min(400px, 92vw)' }}
           >
-            <svg
-              viewBox="0 0 400 320"
-              style={{ width: '100%', height: 'auto', overflow: 'visible' }}
-            >
+            <svg viewBox="0 0 400 320" style={{ width: '100%', height: 'auto', overflow: 'visible' }}>
               <defs>
                 <linearGradient id="fl_outer" x1="0" y1="1" x2="0" y2="0">
                   <stop offset="0%"   stopColor="#FF5500" />
@@ -405,14 +389,12 @@ export function IntroLock({ onUnlocked, onMusicReady }: {
               </defs>
 
               <ellipse cx="200" cy="310" rx="180" ry="20" fill="rgba(196,114,138,0.12)" />
-
               <rect x="5" y="297" width="390" height="18" rx="8" fill="url(#plate)" />
-              <rect x="5" y="297" width="390" height="4" rx="4" fill="rgba(255,180,200,0.1)" />
+              <rect x="5" y="297" width="390" height="4"  rx="4" fill="rgba(255,180,200,0.1)" />
 
               <rect x="14" y="218" width="372" height="79" rx="16" fill="url(#t1)" filter="url(#shadow)" />
-              <rect x="14" y="218" width="372" height="5" rx="5" fill="rgba(255,210,225,0.22)" />
-              <rect x="14" y="218" width="6" height="79" rx="3" fill="rgba(255,200,220,0.1)" />
-
+              <rect x="14" y="218" width="372" height="5"  rx="5"  fill="rgba(255,210,225,0.22)" />
+              <rect x="14" y="218" width="6"   height="79" rx="3"  fill="rgba(255,200,220,0.1)" />
               {[38,72,108,145,182,218,255,292,330,366].map((x, i) => {
                 const h = 10 + [6,12,8,14,6,10,14,8,12,6][i];
                 return (
@@ -422,22 +404,20 @@ export function IntroLock({ onUnlocked, onMusicReady }: {
                   </g>
                 );
               })}
-
               {[50,100,150,200,250,300,350].map((x, i) => (
                 <circle key={x} cx={x} cy={256} r={4.5}
                   fill={i%2===0 ? 'rgba(255,210,228,0.65)' : 'rgba(210,180,242,0.65)'} />
               ))}
-              {[75,175,275,370].map((x) => (
+              {[75,175,275,370].map(x => (
                 <text key={x} x={x} y={270} textAnchor="middle" fontSize="11" fill="rgba(255,220,232,0.45)">★</text>
               ))}
-              {[125,225,325].map((x) => (
+              {[125,225,325].map(x => (
                 <text key={x} x={x} y={270} textAnchor="middle" fontSize="10" fill="rgba(255,200,220,0.5)">♥</text>
               ))}
 
               <rect x="68" y="144" width="264" height="74" rx="13" fill="url(#t2)" filter="url(#shadow)" />
-              <rect x="68" y="144" width="264" height="5" rx="5" fill="rgba(255,220,235,0.25)" />
-              <rect x="68" y="144" width="6" height="74" rx="3" fill="rgba(255,210,225,0.1)" />
-
+              <rect x="68" y="144" width="264" height="5"  rx="5"  fill="rgba(255,220,235,0.25)" />
+              <rect x="68" y="144" width="6"   height="74" rx="3"  fill="rgba(255,210,225,0.1)" />
               {[88,118,150,182,218,254,286,318].map((x, i) => {
                 const h = 8 + [5,10,7,12,6,9,11,7][i];
                 return (
@@ -447,12 +427,10 @@ export function IntroLock({ onUnlocked, onMusicReady }: {
                   </g>
                 );
               })}
-
               {[100,150,200,250,300].map((x, i) => (
                 <circle key={x} cx={x} cy={178} r={3.5}
                   fill={i%2===0 ? 'rgba(255,210,228,0.6)' : 'rgba(200,175,242,0.6)'} />
               ))}
-
               <text x="200" y="196" textAnchor="middle"
                 fontFamily="'Sacramento', cursive" fontSize="28"
                 fill="rgba(255,225,235,0.7)" style={{ userSelect: 'none' }}>
@@ -462,14 +440,12 @@ export function IntroLock({ onUnlocked, onMusicReady }: {
               {CANDLES.map(c => {
                 const isBlown = blown[c.id];
                 return (
-                  <g key={c.id}
-                    onClick={() => blowCandle(c.id)}
-                    style={{ cursor: isBlown ? 'default' : 'pointer' }}
-                  >
+                  <g key={c.id} onClick={() => blowCandle(c.id)}
+                    style={{ cursor: isBlown ? 'default' : 'pointer' }}>
                     <rect x={c.x-24} y={28} width={48} height={120} fill="transparent" />
                     <rect x={c.x-8} y={CANDLE_TOP_Y} width={16} height={CANDLE_BTM_Y - CANDLE_TOP_Y}
                       rx={5} fill={c.color} filter="url(#candleShadow)" />
-                    <rect x={c.x-5} y={CANDLE_TOP_Y + 5} width={3.5}
+                    <rect x={c.x-5} y={CANDLE_TOP_Y+5} width={3.5}
                       height={CANDLE_BTM_Y - CANDLE_TOP_Y - 14} rx={1.75}
                       fill="rgba(255,255,255,0.25)" />
                     <ellipse cx={c.x} cy={CANDLE_BTM_Y} rx={9} ry={3.5} fill={c.shine} opacity={0.35} />
@@ -477,8 +453,7 @@ export function IntroLock({ onUnlocked, onMusicReady }: {
                       stroke="#3A1825" strokeWidth={2.2} strokeLinecap="round" />
                     <circle cx={c.x} cy={WICK_TOP_Y} r={2.5}
                       fill={isBlown ? '#3A1825' : '#FF6000'}
-                      style={{ filter: isBlown ? 'none' : 'drop-shadow(0 0 4px rgba(255,140,0,0.9))' }}
-                    />
+                      style={{ filter: isBlown ? 'none' : 'drop-shadow(0 0 4px rgba(255,140,0,0.9))' }} />
                     {!isBlown && (
                       <g transform={`translate(${c.x}, ${WICK_TOP_Y})`} filter="url(#flameGlow)">
                         <Flame seed={c.id} />
@@ -487,15 +462,11 @@ export function IntroLock({ onUnlocked, onMusicReady }: {
                     {smokeIds.includes(c.id) && <SmokePuff cx={c.x} />}
                     {sparkIds.includes(c.id) && <SparkBurst cx={c.x} />}
                     {isBlown && (
-                      <motion.circle
-                        cx={c.x} cy={WICK_TOP_Y} r={6}
-                        fill="none"
-                        stroke="rgba(196,114,138,0.3)"
-                        strokeWidth={1}
+                      <motion.circle cx={c.x} cy={WICK_TOP_Y} r={6}
+                        fill="none" stroke="rgba(196,114,138,0.3)" strokeWidth={1}
                         initial={{ scale: 0, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
-                        transition={{ duration: 0.3 }}
-                      />
+                        transition={{ duration: 0.3 }} />
                     )}
                   </g>
                 );
@@ -527,6 +498,7 @@ export function IntroLock({ onUnlocked, onMusicReady }: {
               </p>
             </motion.div>
           )}
+
         </motion.div>
       )}
     </AnimatePresence>
