@@ -313,7 +313,7 @@ function Home() {
             whileInView={{ opacity: 1, scale: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
-            className="relative z-20 max-w-3xl"
+            className="relative z-20 max-w-3xl w-full"
           >
             <motion.div
               initial={{ opacity: 0, y: -10 }}
@@ -371,7 +371,7 @@ function Home() {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 1, delay: 0.4, type: 'spring', stiffness: 100 }}
-              className="text-5xl md:text-7xl lg:text-8xl font-serif font-bold mt-10"
+              className="text-4xl md:text-7xl lg:text-8xl font-serif font-bold mt-10"
               style={{
                 background: 'linear-gradient(90deg, #8B3A52 0%, #C4728A 18%, #F0A8BE 35%, #FFD6E4 50%, #F0A8BE 65%, #C4728A 82%, #8B3A52 100%)',
                 backgroundSize: '200% auto',
