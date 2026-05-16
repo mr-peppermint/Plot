@@ -390,7 +390,7 @@ function Home() {
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 1.2, delay: 0.9 }}
-              className="mt-8 flex items-center justify-center gap-3"
+              className="mt-14 flex items-center justify-center gap-3 relative z-30 pointer-events-none"
             >
               {[9, 12, 18, 12, 9].map((size, i) => (
                 <svg key={i} width={size} height={size * 0.9} viewBox="0 0 20 18" fill="currentColor"
