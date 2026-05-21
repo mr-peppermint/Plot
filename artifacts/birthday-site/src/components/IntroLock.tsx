@@ -435,6 +435,7 @@ export function IntroLock({ onUnlocked, onMusicReady }: {
                 fontFamily="'Sacramento', cursive" fontSize="26"
                 fill="rgba(255,225,235,0.7)" style={{ userSelect: 'none' }}>
                 Happy 18th Birthday!
+                How Did You Thought I Will Forget It?
               </text>
 
               {CANDLES.map(c => {
