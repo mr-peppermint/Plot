@@ -164,7 +164,7 @@ function Home() {
                   className="block text-7xl md:text-9xl lg:text-[10rem] italic"
                   style={{
                     background: 'linear-gradient(90deg, #8B3A52 0%, #C4728A 18%, #F0A8BE 35%, #FFD6E4 50%, #F0A8BE 65%, #C4728A 82%, #8B3A52 100%)',
-                    backgroundSize: '100% auto',
+                    backgroundSize: '200% auto',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
                     backgroundClip: 'text',
@@ -172,7 +172,7 @@ function Home() {
                     filter: 'drop-shadow(0 2px 16px rgba(196,114,138,0.55))',
                   }}
                 >
-                  Birthday 00000000
+                  Birthday
                 </span>
               </h1>
 
@@ -187,7 +187,7 @@ function Home() {
                   className="font-script text-5xl md:text-6xl lg:text-7xl"
                   style={{
                     background: 'linear-gradient(90deg, #6B4E8B 0%, #9B7FC8 30%, #CDB8F0 50%, #9B7FC8 70%, #6B4E8B 100%)',
-                    backgroundSize: '175% auto',
+                    backgroundSize: '200% auto',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
                     backgroundClip: 'text',
