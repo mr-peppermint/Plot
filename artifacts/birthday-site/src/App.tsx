@@ -172,7 +172,7 @@ function Home() {
                     filter: 'drop-shadow(0 2px 16px rgba(196,114,138,0.55))',
                   }}
                 >
-                  Birthday 00000000
+                  Birthday
                 </span>
               </h1>
 
