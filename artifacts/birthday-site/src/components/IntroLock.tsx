@@ -434,8 +434,12 @@ export function IntroLock({ onUnlocked, onMusicReady }: {
               <text x="200" y="400" textAnchor="middle"
                 fontFamily="'Sacramento', cursive" fontSize="36"
                 fill="rgba(255,225,235,0.7)" style={{ userSelect: 'none' }}>
-                Happy 18th
-                How Did You Thought I Will Forget It?
+                Happy 18th!
+              </text>
+              <text x="200" y="422" textAnchor="middle"
+                fontFamily="'Inter', sans-serif" fontSize="23"
+                fill="rgba(255,200,220,0.6)" style={{ userSelect: 'none' }}>
+                How Did You Think I Would Forget?
               </text>
 
               {CANDLES.map(c => {
