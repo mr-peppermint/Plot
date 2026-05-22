@@ -436,8 +436,8 @@ export function IntroLock({ onUnlocked, onMusicReady }: {
                 fill="rgba(255,225,235,0.7)" style={{ userSelect: 'none' }}>
                 Happy 18th!
               </text>
-              <text x="200" y="422" textAnchor="middle"
-                fontFamily="'Inter', sans-serif" fontSize="23"
+              <text x="200" y="460" textAnchor="middle"
+                fontFamily="'Inter', sans-serif" fontSize="18"
                 fill="rgba(255,200,220,0.6)" style={{ userSelect: 'none' }}>
                 How Did You Think I Would Forget?
               </text>
