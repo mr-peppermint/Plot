@@ -13,24 +13,24 @@ import { IntroLock } from "./components/IntroLock";
 const queryClient = new QueryClient();
 
 const CHAPTERS = [
-  { label: "Memory", title: "From the Very Start", description: "From the moment you arrived, the world became a brighter, softer place. You were magic from day one, user." },
+  { label: "Memory", title: "From the Very Start", description: "From the moment you arrived, the world became a brighter, softer place. You were magic from day one, USR." },
   { label: "Memory", title: "First Smile", description: "That smile of yours — the one that lights up every room — made its debut and nobody has been the same since." },
   { label: "Memory", title: "Growing So Gracefully", description: "Every step you took, every word you spoke — full of the grace and light that only AJ could carry." },
   { label: "Memory", title: "Shared Giggles", description: "Laughing until it hurt. The kind of joy that stays with you long after the moment fades." },
-  { label: "Memory", title: "Unexpected Sparkle", description: "You have this way of finding magic in ordinary moments. Only user could see the world quite like that." },
+  { label: "Memory", title: "Unexpected Sparkle", description: "You have this way of finding magic in ordinary moments. Only USR could see the world quite like that." },
   { label: "Memory", title: "Finding Her Wings", description: "Brave, bold, and beautifully herself — AJ spreading her wings and owning every moment." },
   { label: "Memory", title: "Quiet Mornings", description: "Soft light, warm tea, and that peaceful look on your face. Cherished moments just like you." },
   { label: "Memory", title: "Dancing Through Life", description: "You move through life like a song — effortlessly, joyfully, and always in perfect rhythm." },
-  { label: "Memory", title: "New Adventures", description: "Each new horizon she met with sparkling eyes and an open heart. That courage is so uniquely user." },
+  { label: "Memory", title: "New Adventures", description: "Each new horizon she met with sparkling eyes and an open heart. That courage is so uniquely USR." },
   { label: "Memory", title: "Warm Hugs", description: "A hug from you feels like coming home. Safe, warm, and full of love — just like you always are." },
   { label: "Memory", title: "Glowing in the Rain", description: "Even on cloudy days, AJ managed to shine. That light of yours cannot be dimmed by anything." },
   { label: "Memory", title: "Late Night Dreams", description: "Talking about everything and nothing. The conversations that stitched hearts closer together." },
   { label: "Memory", title: "Golden Sunsets", description: "Watching the sky blush pink and gold — the perfect backdrop for someone as beautiful as you." },
-  { label: "Memory", title: "Her Spark of Brilliance", description: "That moment when user's eyes lit up with an idea. Pure genius wrapped in the sweetest soul." },
+  { label: "Memory", title: "Her Spark of Brilliance", description: "That moment when USR's eyes lit up with an idea. Pure genius wrapped in the sweetest soul." },
   { label: "Memory", title: "Quiet Strength", description: "Soft as petals, strong as roses. AJ's resilience is one of the most beautiful things about her." },
-  { label: "Memory", title: "Every Win Celebrated", description: "Every achievement, big or small, celebrated with the enthusiasm only user deserves." },
+  { label: "Memory", title: "Every Win Celebrated", description: "Every achievement, big or small, celebrated with the enthusiasm only USR deserves." },
   { label: "Memory", title: "A Song for AJ", description: "If your life were a melody, it would be the most beautiful thing anyone has ever heard." },
-  { label: "Memory", title: "Right Here, Right Now", description: "Today, looking at you — full of grace and love and light — we are so grateful for every day with user." },
+  { label: "Memory", title: "Right Here, Right Now", description: "Today, looking at you — full of grace and love and light — we are so grateful for every day with USR." },
 ];
 
 function HeartIcon({ size = 28 }: { size?: number }) {
@@ -133,7 +133,7 @@ function Home() {
               <HeartIcon size={34} />
             </motion.div>
 
-            {/* For user tagline */}
+            {/* For USR tagline */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -176,7 +176,7 @@ function Home() {
                 </span>
               </h1>
 
-              {/* Script name: user */}
+              {/* Script name: USR */}
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -195,7 +195,7 @@ function Home() {
                     filter: 'drop-shadow(0 2px 12px rgba(155,127,200,0.5))',
                   }}
                 >
-                  user
+                  USR
                 </span>
               </motion.div>
             </motion.div>
@@ -350,7 +350,7 @@ function Home() {
                 animation: 'rose-shimmer 5s linear infinite',
               }}
             >
-              user
+              USR
             </h2>
 
             <div className="rose-line w-24 mx-auto mb-8" />
@@ -382,7 +382,7 @@ function Home() {
                 filter: 'drop-shadow(0 2px 16px rgba(196,114,138,0.5))',
               }}
             >
-              A Very Happy Birthday, user!
+              A Very Happy Birthday, USR!
             </motion.div>
 
             <motion.div
@@ -445,3 +445,4 @@ function App() {
 }
 
 export default App;
+# might just need to find out way to give her a gift card or smth
