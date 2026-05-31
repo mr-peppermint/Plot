@@ -153,26 +153,28 @@ function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.9, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
             >
-              <h1 className="font-serif font-bold tracking-tight leading-none mb-1">
+              <h1 className="font-serif font-bold tracking-tight leading-[1.08] mb-1">
                 <span
                   className="block text-6xl md:text-8xl lg:text-9xl"
                   style={{ color: '#F5D0DC', textShadow: '0 0 80px rgba(196,114,138,0.35), 0 2px 4px rgba(0,0,0,0.8)' }}
                 >
                   Happy
                 </span>
-                <span
-                  className="block text-7xl md:text-9xl lg:text-[10rem] italic"
-                  style={{
-                    background: 'linear-gradient(90deg, #8B3A52 0%, #C4728A 18%, #F0A8BE 35%, #FFD6E4 50%, #F0A8BE 65%, #C4728A 82%, #8B3A52 100%)',
-                    backgroundSize: '200% auto',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundClip: 'text',
-                    animation: 'rose-shimmer 4s linear infinite',
-                    filter: 'drop-shadow(0 2px 16px rgba(196,114,138,0.55))',
-                  }}
-                >
-                  Birthday
+                {/* filter on wrapper so drop-shadow works with transparent text-fill */}
+                <span className="block" style={{ filter: 'drop-shadow(0 2px 16px rgba(196,114,138,0.55))' }}>
+                  <span
+                    className="block text-7xl md:text-9xl lg:text-[10rem] italic"
+                    style={{
+                      background: 'linear-gradient(90deg, #8B3A52 0%, #C4728A 18%, #F0A8BE 35%, #FFD6E4 50%, #F0A8BE 65%, #C4728A 82%, #8B3A52 100%)',
+                      backgroundSize: '200% auto',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      backgroundClip: 'text',
+                      animation: 'rose-shimmer 4s linear infinite',
+                    }}
+                  >
+                    Birthday
+                  </span>
                 </span>
               </h1>
 
@@ -182,17 +184,19 @@ function Home() {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.8, delay: 0.6 }}
                 className="mt-2 mb-1"
+                style={{ filter: 'drop-shadow(0 2px 12px rgba(155,127,200,0.5))' }}
               >
                 <span
                   className="font-script text-5xl md:text-6xl lg:text-7xl"
                   style={{
+                    display: 'inline-block',
+                    paddingBottom: '0.22em',
                     background: 'linear-gradient(90deg, #6B4E8B 0%, #9B7FC8 30%, #CDB8F0 50%, #9B7FC8 70%, #6B4E8B 100%)',
                     backgroundSize: '200% auto',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
                     backgroundClip: 'text',
                     animation: 'rose-shimmer 5s linear infinite',
-                    filter: 'drop-shadow(0 2px 12px rgba(155,127,200,0.5))',
                   }}
                 >
                   USR
@@ -342,6 +346,8 @@ function Home() {
             <h2
               className="text-4xl md:text-6xl lg:text-7xl font-script mb-6"
               style={{
+                display: 'block',
+                paddingBottom: '0.22em',
                 background: 'linear-gradient(90deg, #6B4E8B, #9B7FC8, #CDB8F0, #9B7FC8, #6B4E8B)',
                 backgroundSize: '200% auto',
                 WebkitBackgroundClip: 'text',
@@ -372,17 +378,19 @@ function Home() {
               viewport={{ once: true }}
               transition={{ duration: 1, delay: 0.4, type: 'spring', stiffness: 100 }}
               className="text-4xl md:text-7xl lg:text-8xl font-serif font-bold mt-10"
-              style={{
+              style={{ filter: 'drop-shadow(0 2px 16px rgba(196,114,138,0.5))' }}
+            >
+              <span style={{
+                display: 'block',
                 background: 'linear-gradient(90deg, #8B3A52 0%, #C4728A 18%, #F0A8BE 35%, #FFD6E4 50%, #F0A8BE 65%, #C4728A 82%, #8B3A52 100%)',
                 backgroundSize: '200% auto',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
                 animation: 'rose-shimmer 4s linear infinite',
-                filter: 'drop-shadow(0 2px 16px rgba(196,114,138,0.5))',
-              }}
-            >
-              A Very Happy Birthday, USR!
+              }}>
+                A Very Happy Birthday, USR!
+              </span>
             </motion.div>
 
             <motion.div
