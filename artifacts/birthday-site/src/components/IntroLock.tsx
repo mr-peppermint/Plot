@@ -1,86 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-/* ── Music Engine (Web Audio API) ───────────────── */
-const BEAT = 60 / 76; // seconds per beat at 76 BPM
-
-// Pentatonic-major melody — sweet & looping
-const MELODY: [number, number][] = [
-  // Bar 1 — G5 E5 C5 E5
-  [784.00, BEAT], [659.25, BEAT], [523.25, BEAT], [659.25, BEAT],
-  // Bar 2 — A4 C5 E5 C5
-  [440.00, BEAT], [523.25, BEAT], [659.25, BEAT], [523.25, BEAT],
-  // Bar 3 — G4 A4 C5 A4
-  [392.00, BEAT], [440.00, BEAT], [523.25, BEAT], [440.00, BEAT],
-  // Bar 4 — G4 hold
-  [392.00, BEAT * 4],
-  // Bar 5 — E5 G5 A5 G5
-  [659.25, BEAT], [784.00, BEAT], [880.00, BEAT], [784.00, BEAT],
-  // Bar 6 — E5 C5 G4 A4
-  [659.25, BEAT], [523.25, BEAT], [392.00, BEAT], [440.00, BEAT],
-  // Bar 7 — C5 E5 G5 E5
-  [523.25, BEAT], [659.25, BEAT], [784.00, BEAT], [659.25, BEAT],
-  // Bar 8 — C5 hold
-  [523.25, BEAT * 4],
-];
-
-const LOOP_DUR = MELODY.reduce((s, [, d]) => s + d, 0);
-
-function scheduleLoop(ctx: AudioContext, master: GainNode, t0: number) {
-  let t = t0;
-  for (const [freq, dur] of MELODY) {
-    if (freq > 0) {
-      // Main tone — sine (music-box tine character)
-      const osc  = ctx.createOscillator();
-      const env  = ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, t);
-      env.gain.setValueAtTime(0, t);
-      env.gain.linearRampToValueAtTime(0.85, t + 0.013);
-      env.gain.exponentialRampToValueAtTime(0.001, t + Math.min(dur * 0.75, 0.5));
-      osc.connect(env); env.connect(master);
-      osc.start(t); osc.stop(t + dur);
-
-      // Shimmer octave — very quiet, adds warmth
-      const osc2  = ctx.createOscillator();
-      const env2  = ctx.createGain();
-      osc2.type = 'sine';
-      osc2.frequency.setValueAtTime(freq * 2, t);
-      env2.gain.setValueAtTime(0, t);
-      env2.gain.linearRampToValueAtTime(0.12, t + 0.013);
-      env2.gain.exponentialRampToValueAtTime(0.001, t + Math.min(dur * 0.5, 0.25));
-      osc2.connect(env2); env2.connect(master);
-      osc2.start(t); osc2.stop(t + dur);
-    }
-    t += dur;
-  }
-}
-
-function startMusic(ctx: AudioContext): () => void {
-  const master = ctx.createGain();
-  master.gain.setValueAtTime(0, ctx.currentTime);
-  master.gain.linearRampToValueAtTime(0.22, ctx.currentTime + 3); // gentle fade-in
-  master.connect(ctx.destination);
-
-  let active = true;
-
-  const loop = (startAt: number) => {
-    if (!active) return;
-    scheduleLoop(ctx, master, startAt);
-    // Re-schedule 2 s before end so there is no gap
-    setTimeout(() => loop(startAt + LOOP_DUR), (LOOP_DUR - 2) * 1000);
-  };
-
-  loop(ctx.currentTime + 0.4);
-
-  return () => {
-    active = false;
-    const now = ctx.currentTime;
-    master.gain.setValueAtTime(master.gain.value, now);
-    master.gain.linearRampToValueAtTime(0, now + 1.8);
-  };
-}
-
 /* ── Candle config ─────────────────────────────── */
 const CANDLES = [
   { id: 0, x: 108, color: '#F0A8BE', shine: '#FFE4EE' },
@@ -90,16 +10,16 @@ const CANDLES = [
   { id: 4, x: 292, color: '#F0A8BE', shine: '#FFE4EE' },
 ];
 
-const WICK_TOP_Y    = 74;   // top of wick (flame anchor)
-const CANDLE_TOP_Y  = 84;   // top of candle body
-const CANDLE_BTM_Y  = 144;  // bottom of candle (sits on tier top)
+const WICK_TOP_Y   = 74;
+const CANDLE_TOP_Y = 84;
+const CANDLE_BTM_Y = 144;
 
 /* ── Animated Flame ────────────────────────────── */
 function Flame({ seed }: { seed: number }) {
   const dur = 0.45 + (seed % 5) * 0.08;
   return (
     <motion.g
-      transformOrigin="0px 0px"
+      style={{ transformOrigin: '0px 0px' }}
       animate={{
         x: [0, 1.4, -1.2, 0.8, -1.6, 1.0, 0],
         scaleX: [1, 1.10, 0.84, 1.14, 0.88, 1.06, 1],
@@ -107,19 +27,11 @@ function Flame({ seed }: { seed: number }) {
       }}
       transition={{ duration: dur, repeat: Infinity, ease: 'easeInOut', delay: seed * 0.09 }}
     >
-      {/* Glow halo */}
       <ellipse cx="0" cy="-16" rx="11" ry="18" fill="rgba(255,110,0,0.18)" />
       <ellipse cx="0" cy="-12" rx="7"  ry="12" fill="rgba(255,180,0,0.22)" />
-      {/* Outer flame */}
-      <path d="M0,0 C-7,-11 -11,-26 0,-40 C11,-26 7,-11 0,0 Z"
-        fill="url(#fl_outer)" />
-      {/* Mid flame */}
-      <path d="M0,-2 C-4,-12 -6,-22 0,-30 C6,-22 4,-12 0,-2 Z"
-        fill="url(#fl_mid)" />
-      {/* Bright core */}
-      <path d="M0,-2 C-2,-9 -3,-17 0,-23 C3,-17 2,-9 0,-2 Z"
-        fill="rgba(255,252,180,0.95)" />
-      {/* White tip */}
+      <path d="M0,0 C-7,-11 -11,-26 0,-40 C11,-26 7,-11 0,0 Z" fill="url(#fl_outer)" />
+      <path d="M0,-2 C-4,-12 -6,-22 0,-30 C6,-22 4,-12 0,-2 Z" fill="url(#fl_mid)" />
+      <path d="M0,-2 C-2,-9 -3,-17 0,-23 C3,-17 2,-9 0,-2 Z" fill="rgba(255,252,180,0.95)" />
       <ellipse cx="0" cy="-24" rx="1.8" ry="2.8" fill="rgba(255,255,240,1)" />
     </motion.g>
   );
@@ -128,11 +40,11 @@ function Flame({ seed }: { seed: number }) {
 /* ── Smoke puff after blow ─────────────────────── */
 function SmokePuff({ cx }: { cx: number }) {
   const puffs = [
-    { dx: 0,   sz: 2,   delay: 0    },
-    { dx: -4,  sz: 2.5, delay: 0.12 },
-    { dx: 4,   sz: 2.2, delay: 0.22 },
-    { dx: -2,  sz: 3,   delay: 0.36 },
-    { dx: 3,   sz: 2.4, delay: 0.48 },
+    { dx: 0,  sz: 2,   delay: 0    },
+    { dx: -4, sz: 2.5, delay: 0.12 },
+    { dx: 4,  sz: 2.2, delay: 0.22 },
+    { dx: -2, sz: 3,   delay: 0.36 },
+    { dx: 3,  sz: 2.4, delay: 0.48 },
   ];
   return (
     <>
@@ -188,7 +100,7 @@ function SparkBurst({ cx }: { cx: number }) {
   );
 }
 
-/* ── Confetti burst (DOM layer) on all blown ───── */
+/* ── Confetti burst ─────────────────────────────── */
 function ConfettiBurst() {
   const pieces = Array.from({ length: 40 }, (_, i) => ({
     id: i,
@@ -215,8 +127,7 @@ function ConfettiBurst() {
           {p.shape === 1 && <div style={{ width: 12, height: 5, background: p.color }} />}
           {p.shape === 2 && (
             <svg width="10" height="9" viewBox="0 0 20 18">
-              <path d="M10 0 C10 0 0 6 0 11 C0 15 4.5 18 10 18 C15.5 18 20 15 20 11 C20 6 10 0 10 0Z"
-                fill={p.color} />
+              <path d="M10 0 C10 0 0 6 0 11 C0 15 4.5 18 10 18 C15.5 18 20 15 20 11 C20 6 10 0 10 0Z" fill={p.color} />
             </svg>
           )}
         </motion.div>
@@ -226,82 +137,123 @@ function ConfettiBurst() {
 }
 
 /* ── Main component ────────────────────────────── */
-export function IntroLock({ onUnlocked }: { onUnlocked: () => void }) {
+export function IntroLock({ onUnlocked, onMusicReady }: {
+  onUnlocked: () => void;
+  onMusicReady?: (stopFn: () => void) => void;
+}) {
   const [blown, setBlown]       = useState<boolean[]>(CANDLES.map(() => false));
   const [smokeIds, setSmokeIds] = useState<number[]>([]);
   const [sparkIds, setSparkIds] = useState<number[]>([]);
   const [phase, setPhase]       = useState<'active' | 'allBlown' | 'exit'>('active');
   const [muted, setMuted]       = useState(false);
   const doneRef                 = useRef(false);
-  const ctxRef                  = useRef<AudioContext | null>(null);
-  const stopMusicRef            = useRef<(() => void) | null>(null);
+  const audioRef                = useRef<HTMLAudioElement | null>(null);
   const mutedRef                = useRef(false);
-  const masterVolRef            = useRef<GainNode | null>(null);
+  const fadeTimerRef            = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Start audio — tries on mount, retries on first interaction (mobile policy)
+  /* ── Fade utilities ── */
+  const clearFade = () => {
+    if (fadeTimerRef.current) {
+      clearInterval(fadeTimerRef.current);
+      fadeTimerRef.current = null;
+    }
+  };
+
+  const fadeIn = (audio: HTMLAudioElement, targetVol = 0.5, durationMs = 3000) => {
+    clearFade();
+    audio.volume = 0;
+    const steps    = 80;
+    const stepTime = durationMs / steps;
+    const stepVol  = targetVol / steps;
+    fadeTimerRef.current = setInterval(() => {
+      if (!audio) { clearFade(); return; }
+      const next = Math.min(audio.volume + stepVol, targetVol);
+      audio.volume = next;
+      if (next >= targetVol) clearFade();
+    }, stepTime);
+  };
+
+  const fadeOut = (audio: HTMLAudioElement, durationMs = 1800) => {
+    clearFade();
+    const startVol = audio.volume;
+    const steps    = 80;
+    const stepTime = durationMs / steps;
+    const stepVol  = startVol / steps;
+    fadeTimerRef.current = setInterval(() => {
+      if (!audio) { clearFade(); return; }
+      const next = Math.max(audio.volume - stepVol, 0);
+      audio.volume = next;
+      if (next <= 0) {
+        clearFade();
+        audio.pause();
+      }
+    }, stepTime);
+  };
+
+  /* ── Boot audio ── */
   useEffect(() => {
-    let ctx: AudioContext | null = null;
-    let stopped = false;
+    // 🎵 Place your music file at: artifacts/birthday-site/public/music.mp3
+    const audio = new Audio(import.meta.env.BASE_URL + 'music.mp3');
+    audio.loop   = true;
+    audio.volume = 0;
+    audioRef.current = audio;
 
-    const boot = async () => {
-      if (ctxRef.current) return;
-      ctx = new AudioContext();
-      ctxRef.current = ctx;
-      // Create a top-level mute gate so we can toggle without stopping
-      const muteGate = ctx.createGain();
-      muteGate.gain.value = 1;
-      masterVolRef.current = muteGate;
-      muteGate.connect(ctx.destination);
-      if (ctx.state === 'suspended') await ctx.resume();
-      if (stopped) return;
-      // Wrap startMusic to route through muteGate
-      const master = ctx.createGain();
-      master.gain.setValueAtTime(0, ctx.currentTime);
-      master.gain.linearRampToValueAtTime(0.22, ctx.currentTime + 3);
-      master.connect(muteGate);
-      let active = true;
-      const loop = (startAt: number) => {
-        if (!active) return;
-        scheduleLoop(ctx!, master, startAt);
-        setTimeout(() => loop(startAt + LOOP_DUR), (LOOP_DUR - 2) * 1000);
-      };
-      loop(ctx.currentTime + 0.4);
-      stopMusicRef.current = () => {
-        active = false;
-        const now = ctx!.currentTime;
-        master.gain.setValueAtTime(master.gain.value, now);
-        master.gain.linearRampToValueAtTime(0, now + 1.8);
-      };
+    const start = () => {
+      audio.play()
+        .then(() => fadeIn(audio, 0.5, 3000))
+        .catch(() => {
+          // Autoplay blocked on mobile — wait for first tap
+        });
     };
 
-    boot();
-    const onTouch = () => boot();
-    document.addEventListener('pointerdown', onTouch, { once: true });
+    // Try immediately (works on desktop)
+    start();
+
+    // Retry on first user interaction (required on mobile)
+    const onFirstTouch = () => {
+      if (audio.paused) start();
+    };
+    document.addEventListener('pointerdown', onFirstTouch, { once: true });
+
+    // Give App.tsx a handle to stop the music later from the main page
+    const stopFn = () => {
+      if (audioRef.current) fadeOut(audioRef.current, 1800);
+    };
+    onMusicReady?.(stopFn);
 
     return () => {
-      stopped = true;
-      document.removeEventListener('pointerdown', onTouch);
-      stopMusicRef.current?.();
-      setTimeout(() => ctx?.close(), 2200);
+      document.removeEventListener('pointerdown', onFirstTouch);
+      clearFade();
+      // ✅ Do NOT stop music here — it continues playing on the main page
     };
   }, []);
 
+  /* ── Mute / unmute ── */
   const toggleMute = useCallback(() => {
     mutedRef.current = !mutedRef.current;
     setMuted(mutedRef.current);
-    if (masterVolRef.current && ctxRef.current) {
-      masterVolRef.current.gain.setTargetAtTime(
-        mutedRef.current ? 0 : 1,
-        ctxRef.current.currentTime,
-        0.1,
-      );
+    if (audioRef.current) {
+      // Smooth volume ramp instead of hard cut
+      const target = mutedRef.current ? 0 : 0.5;
+      const audio  = audioRef.current;
+      clearFade();
+      const steps    = 20;
+      const stepTime = 150 / steps;
+      const diff     = (target - audio.volume) / steps;
+      fadeTimerRef.current = setInterval(() => {
+        const next = Math.min(Math.max(audio.volume + diff, 0), 0.5);
+        audio.volume = next;
+        if (next === target || (diff > 0 && next >= target) || (diff < 0 && next <= target)) {
+          clearFade();
+        }
+      }, stepTime);
     }
   }, []);
 
+  /* ── Blow a candle ── */
   const blowCandle = useCallback((id: number) => {
     if (blown[id] || phase !== 'active') return;
 
-    // Show smoke + sparks, clear after animation
     setSmokeIds(p => [...p, id]);
     setSparkIds(p => [...p, id]);
     setTimeout(() => setSmokeIds(p => p.filter(x => x !== id)), 2000);
@@ -313,16 +265,15 @@ export function IntroLock({ onUnlocked }: { onUnlocked: () => void }) {
       if (next.every(Boolean) && !doneRef.current) {
         doneRef.current = true;
         setTimeout(() => setPhase('allBlown'), 300);
-        setTimeout(() => { stopMusicRef.current?.(); }, 1800);
-        setTimeout(() => setPhase('exit'), 2400);
-        setTimeout(() => onUnlocked(), 3300);
+        setTimeout(() => { if (audioRef.current) fadeOut(audioRef.current, 2000); }, 1400);
+        setTimeout(() => setPhase('exit'), 2800);
+        setTimeout(() => onUnlocked(), 4600);
       }
       return next;
     });
   }, [blown, phase, onUnlocked]);
 
   const blownCount = blown.filter(Boolean).length;
-  const allDone    = blownCount === CANDLES.length;
 
   return (
     <AnimatePresence mode="wait">
@@ -333,8 +284,8 @@ export function IntroLock({ onUnlocked }: { onUnlocked: () => void }) {
           style={{
             background: 'radial-gradient(ellipse at 50% 30%, #220A18 0%, #100508 55%, #050203 100%)',
           }}
-          exit={{ opacity: 0, scale: 1.04 }}
-          transition={{ duration: 1.1, ease: 'easeInOut' }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 1.8, ease: [0.4, 0, 0.2, 1] }}
         >
 
           {/* Mute button */}
@@ -357,7 +308,7 @@ export function IntroLock({ onUnlocked }: { onUnlocked: () => void }) {
             {muted ? '🔇' : '🎵'}
           </motion.button>
 
-          {/* Floating star field */}
+          {/* Star field */}
           {Array.from({ length: 55 }, (_, i) => (
             <motion.div key={i}
               className="absolute rounded-full pointer-events-none"
@@ -366,7 +317,7 @@ export function IntroLock({ onUnlocked }: { onUnlocked: () => void }) {
                 height: 1 + (i % 3) * 0.8,
                 left: `${(i * 13.7) % 100}%`,
                 top: `${(i * 17.3) % 100}%`,
-                background: ['rgba(240,168,190,','rgba(196,114,138,','rgba(184,156,216,'][i%3]
+                background: ['rgba(240,168,190,','rgba(196,114,138,','rgba(184,156,216,'][i % 3]
                   + `${0.25 + (i % 4) * 0.12})`,
               }}
               animate={{ opacity: [0.1, 0.85, 0.1] }}
@@ -386,8 +337,7 @@ export function IntroLock({ onUnlocked }: { onUnlocked: () => void }) {
             </motion.div>
           ))}
 
-
-          {/* ── CAKE SVG ── */}
+          {/* Cake SVG */}
           <motion.div
             className="relative z-10"
             initial={{ opacity: 0, scale: 0.82, y: 32 }}
@@ -395,10 +345,7 @@ export function IntroLock({ onUnlocked }: { onUnlocked: () => void }) {
             transition={{ duration: 1, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
             style={{ width: 'min(400px, 92vw)' }}
           >
-            <svg
-              viewBox="0 0 400 320"
-              style={{ width: '100%', height: 'auto', overflow: 'visible' }}
-            >
+            <svg viewBox="0 0 400 440" style={{ width: '100%', height: 'auto', overflow: 'visible' }}>
               <defs>
                 {/* Flame gradients */}
                 <linearGradient id="fl_outer" x1="0" y1="1" x2="0" y2="0">
@@ -413,98 +360,150 @@ export function IntroLock({ onUnlocked }: { onUnlocked: () => void }) {
                   <stop offset="100%" stopColor="#FFF4B0" />
                 </linearGradient>
 
-                {/* Tier gradients */}
+                {/* Bottom tier — rich deep rose, lit warmly at top by candles */}
                 <linearGradient id="t1" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%"   stopColor="#C06080" />
-                  <stop offset="50%"  stopColor="#A05068" />
-                  <stop offset="100%" stopColor="#7A3850" />
+                  <stop offset="0%"   stopColor="#C86882" />
+                  <stop offset="30%"  stopColor="#A85870" />
+                  <stop offset="70%"  stopColor="#883858" />
+                  <stop offset="100%" stopColor="#5E2038" />
                 </linearGradient>
+                {/* Top tier — slightly lighter rose plum */}
                 <linearGradient id="t2" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%"   stopColor="#D880A0" />
-                  <stop offset="50%"  stopColor="#B86080" />
-                  <stop offset="100%" stopColor="#8C4060" />
+                  <stop offset="0%"   stopColor="#E090B0" />
+                  <stop offset="28%"  stopColor="#C87095" />
+                  <stop offset="68%"  stopColor="#A04870" />
+                  <stop offset="100%" stopColor="#78304C" />
                 </linearGradient>
+                {/* Left-side shadow for 3D depth */}
+                <linearGradient id="sideL" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%"   stopColor="rgba(0,0,0,0.38)" />
+                  <stop offset="100%" stopColor="rgba(0,0,0,0)" />
+                </linearGradient>
+                {/* Right-side ambient highlight */}
+                <linearGradient id="sideR" x1="1" y1="0" x2="0" y2="0">
+                  <stop offset="0%"   stopColor="rgba(255,190,210,0.1)" />
+                  <stop offset="100%" stopColor="rgba(255,190,210,0)" />
+                </linearGradient>
+                {/* Frosting — cream white */}
                 <linearGradient id="frost" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%"   stopColor="#FFF5F8" />
-                  <stop offset="100%" stopColor="#F8D8E4" />
+                  <stop offset="0%"   stopColor="#FFFCFA" />
+                  <stop offset="100%" stopColor="#F9D8E4" />
                 </linearGradient>
+                {/* Plate */}
                 <linearGradient id="plate" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%"   stopColor="#3A1520" />
                   <stop offset="100%" stopColor="#1A0810" />
                 </linearGradient>
-                <linearGradient id="cakeGlow" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%"   stopColor="rgba(240,168,190,0.18)" />
-                  <stop offset="100%" stopColor="rgba(196,114,138,0)" />
-                </linearGradient>
+                {/* Candle light pool on tier top surface */}
+                <radialGradient id="candlePool" cx="50%" cy="0%" r="90%" fx="50%" fy="0%">
+                  <stop offset="0%"   stopColor="rgba(255,155,30,0.28)" />
+                  <stop offset="55%"  stopColor="rgba(255,110,10,0.10)" />
+                  <stop offset="100%" stopColor="rgba(255,80,0,0)" />
+                </radialGradient>
 
-                {/* Drop shadow filter */}
-                <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-                  <feDropShadow dx="0" dy="6" stdDeviation="10" floodColor="rgba(0,0,0,0.55)" />
+                {/* Drop shadow for tiers */}
+                <filter id="shadow" x="-20%" y="-20%" width="150%" height="160%">
+                  <feDropShadow dx="0" dy="9" stdDeviation="13" floodColor="rgba(0,0,0,0.65)" />
                 </filter>
+                {/* Candle body shadow */}
                 <filter id="candleShadow">
-                  <feDropShadow dx="0" dy="2" stdDeviation="4" floodColor="rgba(0,0,0,0.4)" />
+                  <feDropShadow dx="1" dy="3" stdDeviation="4" floodColor="rgba(0,0,0,0.45)" />
                 </filter>
-                <filter id="flameGlow">
-                  <feGaussianBlur stdDeviation="3" result="blur" />
+                {/* Flame bloom */}
+                <filter id="flameGlow" x="-60%" y="-60%" width="220%" height="220%">
+                  <feGaussianBlur stdDeviation="3.5" result="blur" />
+                  <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+                </filter>
+                {/* Soft inner glow for text */}
+                <filter id="textGlow" x="-30%" y="-30%" width="160%" height="160%">
+                  <feGaussianBlur stdDeviation="4" result="blur" />
                   <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
                 </filter>
               </defs>
 
-              {/* ── Ambient glow under cake ── */}
-              <ellipse cx="200" cy="310" rx="180" ry="20"
-                fill="rgba(196,114,138,0.12)" />
+              {/* ── Ground cast shadow ── */}
+              <ellipse cx="200" cy="318" rx="192" ry="16" fill="rgba(0,0,0,0.4)" />
 
-              {/* ── Cake plate ── */}
-              <rect x="5" y="297" width="390" height="18" rx="8"
-                fill="url(#plate)" />
-              <rect x="5" y="297" width="390" height="4" rx="4"
-                fill="rgba(255,180,200,0.1)" />
+              {/* ── Cake Plate ── */}
+              <rect x="5"  y="304" width="390" height="14" rx="7" fill="url(#plate)" />
+              <rect x="5"  y="304" width="390" height="3"  rx="3" fill="rgba(255,180,200,0.12)" />
+              <rect x="20" y="310" width="360" height="4"  rx="2" fill="rgba(0,0,0,0.25)" />
 
-              {/* ── BOTTOM TIER ── */}
-              <rect x="14" y="218" width="372" height="79" rx="16"
-                fill="url(#t1)" filter="url(#shadow)" />
-              {/* Highlight stripe */}
-              <rect x="14" y="218" width="372" height="5" rx="5"
-                fill="rgba(255,210,225,0.22)" />
-              {/* Side highlight */}
-              <rect x="14" y="218" width="6" height="79" rx="3"
-                fill="rgba(255,200,220,0.1)" />
+              {/* ══ BOTTOM TIER ══════════════════════════ */}
+              {/* Main body */}
+              <rect x="14" y="220" width="372" height="84" rx="15" fill="url(#t1)" filter="url(#shadow)" />
+              {/* Top-edge gloss highlight */}
+              <rect x="14" y="220" width="372" height="8"  rx="6"  fill="rgba(255,205,225,0.30)" />
+              {/* Left-side shadow (3-D depth) */}
+              <rect x="14" y="220" width="28"  height="84" rx="5"  fill="url(#sideL)" />
+              {/* Right-side ambient highlight */}
+              <rect x="358" y="220" width="28" height="84" rx="5"  fill="url(#sideR)" />
+              {/* Bottom shadow edge */}
+              <rect x="18" y="295" width="364" height="9"  rx="4"  fill="rgba(0,0,0,0.30)" />
 
               {/* Bottom tier frosting drips */}
               {[38,72,108,145,182,218,255,292,330,366].map((x, i) => {
                 const h = 10 + [6,12,8,14,6,10,14,8,12,6][i];
                 return (
                   <g key={x}>
-                    <rect x={x-9} y={216} width={18} height={h+3} rx={9} fill="url(#frost)" />
-                    <ellipse cx={x} cy={216+h+3} rx={9} ry={6.5} fill="url(#frost)" />
+                    <rect x={x-9} y={218} width={18} height={h+4} rx={9} fill="url(#frost)" />
+                    <ellipse cx={x} cy={218+h+4} rx={9} ry={6.5} fill="url(#frost)" />
+                    <circle  cx={x-2} cy={220} r={2.8} fill="rgba(255,255,255,0.6)" />
                   </g>
                 );
               })}
+              {/* Bottom pearl row along top edge */}
+              {Array.from({ length: 17 }, (_, i) => (
+                <circle key={i} cx={32 + i * 20} cy={222} r={5}
+                  fill="url(#frost)"
+                  style={{ filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.28))' }} />
+              ))}
+              {/* Bottom tier polka dots */}
+              {[55,105,155,200,248,298,348].map((x, i) => (
+                <circle key={x} cx={x} cy={260} r={4.5}
+                  fill={i%2===0 ? 'rgba(255,210,228,0.70)' : 'rgba(210,182,244,0.70)'} />
+              ))}
+              {/* Tier decorative symbols */}
+              {[82,182,282,372].map(x => (
+                <text key={x} x={x} y={278} textAnchor="middle" fontSize="12" fill="rgba(255,220,232,0.45)">★</text>
+              ))}
+              {[132,232,322].map(x => (
+                <text key={x} x={x} y={277} textAnchor="middle" fontSize="11" fill="rgba(255,200,220,0.55)">♥</text>
+              ))}
 
-              {/* Bottom tier decor: dots */}
-              {[50,100,150,200,250,300,350].map((x, i) => (
-                <circle key={x} cx={x} cy={256} r={4.5}
-                  fill={i%2===0 ? 'rgba(255,210,228,0.65)' : 'rgba(210,180,242,0.65)'} />
-              ))}
-              {/* Stars */}
-              {[75,175,275,370].map((x, i) => (
-                <text key={x} x={x} y={270} textAnchor="middle"
-                  fontSize="11" fill="rgba(255,220,232,0.45)">★</text>
-              ))}
-              {/* Hearts */}
-              {[125,225,325].map((x) => (
-                <text key={x} x={x} y={270} textAnchor="middle"
-                  fontSize="10" fill="rgba(255,200,220,0.5)">♥</text>
-              ))}
+              {/* ══ TOP TIER ══════════════════════════ */}
+              {/* Main body */}
+              <rect x="68" y="144" width="264" height="76" rx="12" fill="url(#t2)" filter="url(#shadow)" />
+              {/* Top-edge gloss highlight */}
+              <rect x="68" y="144" width="264" height="7"  rx="5"  fill="rgba(255,220,238,0.32)" />
+              {/* Left-side shadow (3-D depth) */}
+              <rect x="68" y="144" width="22"  height="76" rx="4"  fill="url(#sideL)" />
+              {/* Right-side ambient highlight */}
+              <rect x="310" y="144" width="22" height="76" rx="4"  fill="url(#sideR)" />
+              {/* Bottom shadow edge */}
+              <rect x="72"  y="211" width="256" height="9"  rx="4"  fill="rgba(0,0,0,0.26)" />
 
-              {/* ── TOP TIER ── */}
-              <rect x="68" y="144" width="264" height="74" rx="13"
-                fill="url(#t2)" filter="url(#shadow)" />
-              {/* Highlight */}
-              <rect x="68" y="144" width="264" height="5" rx="5"
-                fill="rgba(255,220,235,0.25)" />
-              <rect x="68" y="144" width="6" height="74" rx="3"
-                fill="rgba(255,210,225,0.1)" />
+              {/* ── Animated candle-light glow pools on top tier surface ── */}
+              {CANDLES.map(c => !blown[c.id] && (
+                <motion.ellipse
+                  key={`pool-${c.id}`}
+                  cx={c.x} cy={144} rx={38} ry={9}
+                  fill="url(#candlePool)"
+                  initial={{ opacity: 0.4 }}
+                  animate={{ opacity: [0.35, 0.9, 0.35] }}
+                  transition={{ duration: 0.62 + c.id * 0.09, repeat: Infinity, ease: 'easeInOut', delay: c.id * 0.11 }}
+                />
+              ))}
+              {/* Combined warm wash across whole top surface when ≥1 candle lit */}
+              {blown.filter(Boolean).length < CANDLES.length && (
+                <motion.rect
+                  x="68" y="144" width="264" height="24" rx="4"
+                  fill="rgba(255,130,20,0.08)"
+                  initial={{ opacity: 0.5 }}
+                  animate={{ opacity: [0.4, 0.9, 0.4] }}
+                  transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
+                />
+              )}
 
               {/* Top tier frosting drips */}
               {[88,118,150,182,218,254,286,318].map((x, i) => {
@@ -513,97 +512,109 @@ export function IntroLock({ onUnlocked }: { onUnlocked: () => void }) {
                   <g key={x}>
                     <rect x={x-8} y={142} width={16} height={h+3} rx={8} fill="url(#frost)" />
                     <ellipse cx={x} cy={142+h+3} rx={8} ry={5.5} fill="url(#frost)" />
+                    <circle  cx={x-2} cy={143} r={2.2} fill="rgba(255,255,255,0.65)" />
                   </g>
                 );
               })}
-
-              {/* Top tier decor */}
-              {[100,150,200,250,300].map((x, i) => (
-                <circle key={x} cx={x} cy={178} r={3.5}
-                  fill={i%2===0 ? 'rgba(255,210,228,0.6)' : 'rgba(200,175,242,0.6)'} />
+              {/* Top pearl row */}
+              {Array.from({ length: 9 }, (_, i) => (
+                <circle key={i} cx={86 + i * 26} cy={146} r={4.5}
+                  fill="url(#frost)"
+                  style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.22))' }} />
+              ))}
+              {/* Top tier polka dots */}
+              {[104,152,200,248,296].map((x, i) => (
+                <circle key={x} cx={x} cy={183} r={3.5}
+                  fill={i%2===0 ? 'rgba(255,210,228,0.65)' : 'rgba(200,175,242,0.65)'} />
               ))}
 
               {/* "Angel" script on top tier */}
-              <text x="200" y="196" textAnchor="middle"
-                fontFamily="'Sacramento', cursive" fontSize="28"
-                fill="rgba(255,225,235,0.7)" style={{ userSelect: 'none' }}>
+              <text x="200" y="197" textAnchor="middle"
+                fontFamily="'Sacramento', cursive" fontSize="38"
+                fill="rgba(255,234,244,0.78)"
+                filter="url(#textGlow)"
+                style={{ userSelect: 'none' }}>
                 Angel
               </text>
 
-              {/* ── CANDLES ── */}
+              {/* ══ CANDLES ══════════════════════════ */}
               {CANDLES.map(c => {
                 const isBlown = blown[c.id];
                 return (
-                  <g key={c.id}
-                    onClick={() => blowCandle(c.id)}
-                    style={{ cursor: isBlown ? 'default' : 'pointer' }}
-                  >
-                    {/* Large hit area */}
-                    <rect x={c.x-24} y={28} width={48} height={120} fill="transparent" />
-
+                  <g key={c.id} onClick={() => blowCandle(c.id)}
+                    style={{ cursor: isBlown ? 'default' : 'pointer' }}>
+                    {/* Wide tap target */}
+                    <rect x={c.x-26} y={20} width={52} height={130} fill="transparent" />
                     {/* Candle body */}
-                    <rect x={c.x-8} y={CANDLE_TOP_Y} width={16} height={CANDLE_BTM_Y - CANDLE_TOP_Y}
+                    <rect x={c.x-8} y={CANDLE_TOP_Y} width={16}
+                      height={CANDLE_BTM_Y - CANDLE_TOP_Y}
                       rx={5} fill={c.color} filter="url(#candleShadow)" />
-
-                    {/* Shine */}
-                    <rect x={c.x-5} y={CANDLE_TOP_Y + 5} width={3.5}
+                    {/* Highlight stripe */}
+                    <rect x={c.x-5} y={CANDLE_TOP_Y+5} width={3.5}
                       height={CANDLE_BTM_Y - CANDLE_TOP_Y - 14} rx={1.75}
-                      fill="rgba(255,255,255,0.25)" />
-
-                    {/* Wax drip at candle base */}
+                      fill="rgba(255,255,255,0.28)" />
+                    {/* Base shine */}
                     <ellipse cx={c.x} cy={CANDLE_BTM_Y} rx={9} ry={3.5}
-                      fill={c.shine} opacity={0.35} />
-
+                      fill={c.shine} opacity={0.38} />
                     {/* Wick */}
                     <line x1={c.x} y1={CANDLE_TOP_Y} x2={c.x} y2={WICK_TOP_Y}
                       stroke="#3A1825" strokeWidth={2.2} strokeLinecap="round" />
-
-                    {/* Wick tip / ember */}
+                    {/* Ember / char */}
                     <circle cx={c.x} cy={WICK_TOP_Y} r={2.5}
                       fill={isBlown ? '#3A1825' : '#FF6000'}
-                      style={{
-                        filter: isBlown ? 'none' : 'drop-shadow(0 0 4px rgba(255,140,0,0.9))',
-                      }}
-                    />
-
-                    {/* Flame (animated) */}
+                      style={{ filter: isBlown ? 'none' : 'drop-shadow(0 0 5px rgba(255,140,0,1))' }} />
+                    {/* Warm halo on candle body when burning */}
                     {!isBlown && (
-                      <g transform={`translate(${c.x}, ${WICK_TOP_Y})`}
-                        filter="url(#flameGlow)">
+                      <motion.ellipse cx={c.x} cy={CANDLE_TOP_Y + 8} rx={9} ry={6}
+                        animate={{ opacity: [0.18, 0.38, 0.18] }}
+                        transition={{ duration: 0.55 + c.id * 0.07, repeat: Infinity }}
+                        fill="rgba(255,160,40,0.35)" />
+                    )}
+                    {/* Flame */}
+                    {!isBlown && (
+                      <g transform={`translate(${c.x}, ${WICK_TOP_Y})`} filter="url(#flameGlow)">
                         <Flame seed={c.id} />
                       </g>
                     )}
-
-                    {/* Smoke puff on blow */}
                     {smokeIds.includes(c.id) && <SmokePuff cx={c.x} />}
-
-                    {/* Spark burst on blow */}
                     {sparkIds.includes(c.id) && <SparkBurst cx={c.x} />}
-
-                    {/* Blown-out indicator (subtle ring) */}
                     {isBlown && (
-                      <motion.circle
-                        cx={c.x} cy={WICK_TOP_Y} r={6}
-                        fill="none"
-                        stroke="rgba(196,114,138,0.3)"
-                        strokeWidth={1}
+                      <motion.circle cx={c.x} cy={WICK_TOP_Y} r={7}
+                        fill="none" stroke="rgba(196,114,138,0.3)" strokeWidth={1}
                         initial={{ scale: 0, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ duration: 0.3 }}
-                      />
+                        animate={{ scale: 1.2, opacity: 0 }}
+                        transition={{ duration: 0.5 }} />
                     )}
                   </g>
                 );
               })}
+
+              {/* ── Texts below cake ── */}
+              <text x="200" y="362" textAnchor="middle"
+                fontFamily="'Sacramento', cursive" fontSize="36"
+                fill="rgba(240,168,190,0.75)"
+                style={{ userSelect: 'none' }}>
+                Happy 18th!
+              </text>
+              <text x="200" y="400" textAnchor="middle"
+                fontFamily="'Inter', sans-serif" fontSize="12.5"
+                fill="rgba(196,114,138,0.52)"
+                style={{ userSelect: 'none' }}>
+                How Did You Think I Would Forget?
+              </text>
+              {/* Decorative hearts */}
+              {[-28,-10,10,28].map((dx, i) => (
+                <text key={i} x={200+dx} y={428} textAnchor="middle" fontSize="9"
+                  fill={`rgba(196,114,138,${i===1||i===2 ? 0.55 : 0.28})`}
+                  style={{ userSelect: 'none' }}>♥</text>
+              ))}
             </svg>
           </motion.div>
 
-          {/* ── All blown celebration ── */}
           <AnimatePresence>
             {phase === 'allBlown' && <ConfettiBurst />}
           </AnimatePresence>
 
-          {/* ── Tap hint when no candles blown ── */}
           {blownCount === 0 && (
             <motion.div
               className="absolute bottom-10 z-10 flex flex-col items-center gap-2"
@@ -624,6 +635,7 @@ export function IntroLock({ onUnlocked }: { onUnlocked: () => void }) {
               </p>
             </motion.div>
           )}
+
         </motion.div>
       )}
     </AnimatePresence>

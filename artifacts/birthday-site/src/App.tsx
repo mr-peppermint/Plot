@@ -13,24 +13,24 @@ import { IntroLock } from "./components/IntroLock";
 const queryClient = new QueryClient();
 
 const CHAPTERS = [
-  { label: "Memory", title: "From the Very Start", description: "From the moment you arrived, the world became a brighter, softer place. You were magic from day one, Angel." },
-  { label: "Chapter", title: "First Smile", description: "That smile of yours — the one that lights up every room — made its debut and nobody has been the same since." },
-  { label: "Year", title: "Growing So Gracefully", description: "Every step you took, every word you spoke — full of the grace and light that only AJ could carry." },
+  { label: "Memory", title: "From the Very Start", description: "From the moment you arrived, the world became a brighter, softer place. You were magic from day one, USR." },
+  { label: "Memory", title: "First Smile", description: "That smile of yours — the one that lights up every room — made its debut and nobody has been the same since." },
+  { label: "Memory", title: "Growing So Gracefully", description: "Every step you took, every word you spoke — full of the grace and light that only AJ could carry." },
   { label: "Memory", title: "Shared Giggles", description: "Laughing until it hurt. The kind of joy that stays with you long after the moment fades." },
-  { label: "Chapter", title: "Unexpected Sparkle", description: "You have this way of finding magic in ordinary moments. Only Angel could see the world quite like that." },
-  { label: "Year", title: "Finding Her Wings", description: "Brave, bold, and beautifully herself — AJ spreading her wings and owning every moment." },
+  { label: "Memory", title: "Unexpected Sparkle", description: "You have this way of finding magic in ordinary moments. Only USR could see the world quite like that." },
+  { label: "Memory", title: "Finding Her Wings", description: "Brave, bold, and beautifully herself — AJ spreading her wings and owning every moment." },
   { label: "Memory", title: "Quiet Mornings", description: "Soft light, warm tea, and that peaceful look on your face. Cherished moments just like you." },
-  { label: "Chapter", title: "Dancing Through Life", description: "You move through life like a song — effortlessly, joyfully, and always in perfect rhythm." },
-  { label: "Year", title: "New Adventures", description: "Each new horizon she met with sparkling eyes and an open heart. That courage is so uniquely Angel." },
+  { label: "Memory", title: "Dancing Through Life", description: "You move through life like a song — effortlessly, joyfully, and always in perfect rhythm." },
+  { label: "Memory", title: "New Adventures", description: "Each new horizon she met with sparkling eyes and an open heart. That courage is so uniquely USR." },
   { label: "Memory", title: "Warm Hugs", description: "A hug from you feels like coming home. Safe, warm, and full of love — just like you always are." },
-  { label: "Chapter", title: "Glowing in the Rain", description: "Even on cloudy days, AJ managed to shine. That light of yours cannot be dimmed by anything." },
-  { label: "Year", title: "Late Night Dreams", description: "Talking about everything and nothing. The conversations that stitched hearts closer together." },
+  { label: "Memory", title: "Glowing in the Rain", description: "Even on cloudy days, AJ managed to shine. That light of yours cannot be dimmed by anything." },
+  { label: "Memory", title: "Late Night Dreams", description: "Talking about everything and nothing. The conversations that stitched hearts closer together." },
   { label: "Memory", title: "Golden Sunsets", description: "Watching the sky blush pink and gold — the perfect backdrop for someone as beautiful as you." },
-  { label: "Chapter", title: "Her Spark of Brilliance", description: "That moment when Angel's eyes lit up with an idea. Pure genius wrapped in the sweetest soul." },
-  { label: "Year", title: "Quiet Strength", description: "Soft as petals, strong as roses. AJ's resilience is one of the most beautiful things about her." },
-  { label: "Memory", title: "Every Win Celebrated", description: "Every achievement, big or small, celebrated with the enthusiasm only Angel deserves." },
-  { label: "Chapter", title: "A Song for AJ", description: "If your life were a melody, it would be the most beautiful thing anyone has ever heard." },
-  { label: "Year", title: "Right Here, Right Now", description: "Today, looking at you — full of grace and love and light — we are so grateful for every day with Angel." },
+  { label: "Memory", title: "Her Spark of Brilliance", description: "That moment when USR's eyes lit up with an idea. Pure genius wrapped in the sweetest soul." },
+  { label: "Memory", title: "Quiet Strength", description: "Soft as petals, strong as roses. AJ's resilience is one of the most beautiful things about her." },
+  { label: "Memory", title: "Every Win Celebrated", description: "Every achievement, big or small, celebrated with the enthusiasm only USR deserves." },
+  { label: "Memory", title: "A Song for AJ", description: "If your life were a melody, it would be the most beautiful thing anyone has ever heard." },
+  { label: "Memory", title: "Right Here, Right Now", description: "Today, looking at you — full of grace and love and light — we are so grateful for every day with USR." },
 ];
 
 function HeartIcon({ size = 28 }: { size?: number }) {
@@ -97,7 +97,7 @@ function Home() {
   const heroY = useTransform(scrollYProgress, [0, 0.18], [0, -50]);
 
   return (
-    <div className="relative min-h-screen w-full bg-gradient-dynamic overflow-hidden">
+    <div className="relative min-h-screen w-full bg-gradient-dynamic overflow-x-hidden">
       <AnimatedBackground />
 
       <div
@@ -133,7 +133,7 @@ function Home() {
               <HeartIcon size={34} />
             </motion.div>
 
-            {/* For Angel tagline */}
+            {/* For USR tagline */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -142,7 +142,7 @@ function Home() {
             >
               <FeminineFloral />
               <span className="text-[10px] md:text-xs font-sans font-semibold tracking-[0.38em] uppercase" style={{ color: '#C4728A' }}>
-                For You, Angel
+                For You, MiLady
               </span>
               <FeminineFloral flip />
             </motion.div>
@@ -153,49 +153,53 @@ function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.9, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
             >
-              <h1 className="font-serif font-bold tracking-tight leading-none mb-1">
+              <h1 className="font-serif font-bold tracking-tight leading-[1.08] mb-1">
                 <span
                   className="block text-6xl md:text-8xl lg:text-9xl"
                   style={{ color: '#F5D0DC', textShadow: '0 0 80px rgba(196,114,138,0.35), 0 2px 4px rgba(0,0,0,0.8)' }}
                 >
                   Happy
                 </span>
-                <span
-                  className="block text-7xl md:text-9xl lg:text-[10rem] italic"
-                  style={{
-                    background: 'linear-gradient(90deg, #8B3A52 0%, #C4728A 18%, #F0A8BE 35%, #FFD6E4 50%, #F0A8BE 65%, #C4728A 82%, #8B3A52 100%)',
-                    backgroundSize: '200% auto',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundClip: 'text',
-                    animation: 'rose-shimmer 4s linear infinite',
-                    filter: 'drop-shadow(0 2px 16px rgba(196,114,138,0.55))',
-                  }}
-                >
-                  Birthday
+                {/* filter on wrapper so drop-shadow works with transparent text-fill */}
+                <span className="block" style={{ filter: 'drop-shadow(0 2px 16px rgba(196,114,138,0.55))' }}>
+                  <span
+                    className="block text-7xl md:text-9xl lg:text-[10rem] italic"
+                    style={{
+                      background: 'linear-gradient(90deg, #8B3A52 0%, #C4728A 18%, #F0A8BE 35%, #FFD6E4 50%, #F0A8BE 65%, #C4728A 82%, #8B3A52 100%)',
+                      backgroundSize: '200% auto',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      backgroundClip: 'text',
+                      animation: 'rose-shimmer 4s linear infinite',
+                    }}
+                  >
+                    Birthday
+                  </span>
                 </span>
               </h1>
 
-              {/* Script name: Angel */}
+              {/* Script name: USR */}
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.8, delay: 0.6 }}
                 className="mt-2 mb-1"
+                style={{ filter: 'drop-shadow(0 2px 12px rgba(155,127,200,0.5))' }}
               >
                 <span
                   className="font-script text-5xl md:text-6xl lg:text-7xl"
                   style={{
+                    display: 'inline-block',
+                    paddingBottom: '0.22em',
                     background: 'linear-gradient(90deg, #6B4E8B 0%, #9B7FC8 30%, #CDB8F0 50%, #9B7FC8 70%, #6B4E8B 100%)',
                     backgroundSize: '200% auto',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
                     backgroundClip: 'text',
                     animation: 'rose-shimmer 5s linear infinite',
-                    filter: 'drop-shadow(0 2px 12px rgba(155,127,200,0.5))',
                   }}
                 >
-                  Angel
+                  USR
                 </span>
               </motion.div>
             </motion.div>
@@ -219,7 +223,7 @@ function Home() {
                 <svg width="10" height="9" viewBox="0 0 20 18" fill="#F0A8BE">
                   <path d="M10 0 C10 0 0 6 0 11 C0 15 4.5 18 10 18 C15.5 18 20 15 20 11 C20 6 10 0 10 0Z" />
                 </svg>
-                always & forever AJ
+                always cheering for you AJ
                 <svg width="10" height="9" viewBox="0 0 20 18" fill="#F0A8BE">
                   <path d="M10 0 C10 0 0 6 0 11 C0 15 4.5 18 10 18 C15.5 18 20 15 20 11 C20 6 10 0 10 0Z" />
                 </svg>
@@ -234,7 +238,7 @@ function Home() {
               className="font-sans text-sm md:text-base tracking-[0.15em] mt-5 max-w-sm mx-auto"
               style={{ color: 'rgba(196,114,138,0.65)' }}
             >
-              Every year is a new chapter of your beautiful story
+              Every year is a new chapter of your fascinating story
             </motion.p>
 
             {/* Scroll line */}
@@ -267,7 +271,7 @@ function Home() {
         >
           <RoseDivider />
           <p className="text-xs md:text-sm tracking-[0.3em] uppercase font-sans my-4" style={{ color: 'rgba(196,114,138,0.45)' }}>
-            Memories made with Angel
+            Weaving the beautiful memories
           </p>
           <RoseDivider />
         </motion.section>
@@ -297,7 +301,7 @@ function Home() {
         </section>
 
         {/* ── CLOSING ── */}
-        <section className="w-full min-h-[90dvh] flex flex-col items-center justify-center p-6 text-center relative overflow-hidden">
+        <section className="w-full min-h-[90dvh] flex flex-col items-center justify-center p-6 pb-24 text-center relative overflow-x-hidden">
           <FloatingBalloons count={6} />
           <ConfettiBurst />
           <Sparkles count={30} colors={['#F0A8BE', '#C4728A', '#CDB8F0', '#9B7FC8', '#F5D0DC', '#B89CD8', '#FFD6E4']} />
@@ -313,7 +317,7 @@ function Home() {
             whileInView={{ opacity: 1, scale: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
-            className="relative z-10 max-w-3xl"
+            className="relative z-20 max-w-3xl w-full"
           >
             <motion.div
               initial={{ opacity: 0, y: -10 }}
@@ -342,6 +346,8 @@ function Home() {
             <h2
               className="text-4xl md:text-6xl lg:text-7xl font-script mb-6"
               style={{
+                display: 'block',
+                paddingBottom: '0.22em',
                 background: 'linear-gradient(90deg, #6B4E8B, #9B7FC8, #CDB8F0, #9B7FC8, #6B4E8B)',
                 backgroundSize: '200% auto',
                 WebkitBackgroundClip: 'text',
@@ -350,19 +356,19 @@ function Home() {
                 animation: 'rose-shimmer 5s linear infinite',
               }}
             >
-              Angel
+              USR
             </h2>
 
             <div className="rose-line w-24 mx-auto mb-8" />
 
             <p className="text-base md:text-xl leading-relaxed mb-5 max-w-lg mx-auto font-sans" style={{ color: 'rgba(196,114,138,0.65)' }}>
               May every day bring you the joy you so effortlessly give to everyone around you.
-              You are cherished more than words can say, AJ.
+              You are a treasure beyond measure, AJ.
             </p>
             <p className="text-sm md:text-base leading-relaxed mb-14 max-w-md mx-auto font-sans" style={{ color: 'rgba(240,168,190,0.5)' }}>
-              The world is more beautiful, more gentle, and more full of love
-              simply because Angel is in it.
-            </p>
+              The World Wont Be F_N Without "U", How Would I LA_GH Without "U".
+              Thank You For Being The Most Wonderful Person In The World, And For Being You. My Dearest Friend, My Sunshine. 
+              </p>
 
             <RoseDivider />
 
@@ -371,18 +377,20 @@ function Home() {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 1, delay: 0.4, type: 'spring', stiffness: 100 }}
-              className="text-5xl md:text-7xl lg:text-8xl font-serif font-bold mt-10"
-              style={{
+              className="text-4xl md:text-7xl lg:text-8xl font-serif font-bold mt-10"
+              style={{ filter: 'drop-shadow(0 2px 16px rgba(196,114,138,0.5))' }}
+            >
+              <span style={{
+                display: 'block',
                 background: 'linear-gradient(90deg, #8B3A52 0%, #C4728A 18%, #F0A8BE 35%, #FFD6E4 50%, #F0A8BE 65%, #C4728A 82%, #8B3A52 100%)',
                 backgroundSize: '200% auto',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
                 animation: 'rose-shimmer 4s linear infinite',
-                filter: 'drop-shadow(0 2px 16px rgba(196,114,138,0.5))',
-              }}
-            >
-              Happy Birthday, Angel!
+              }}>
+                A Very Happy Birthday, USR!
+              </span>
             </motion.div>
 
             <motion.div
@@ -390,7 +398,7 @@ function Home() {
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 1.2, delay: 0.9 }}
-              className="mt-8 flex items-center justify-center gap-3"
+              className="mt-14 flex items-center justify-center gap-3 relative z-30 pointer-events-none"
             >
               {[9, 12, 18, 12, 9].map((size, i) => (
                 <svg key={i} width={size} height={size * 0.9} viewBox="0 0 20 18" fill="currentColor"
@@ -409,7 +417,7 @@ function Home() {
               className="mt-8"
             >
               <span className="font-script text-3xl" style={{ color: 'rgba(196,114,138,0.6)' }}>
-                with all our love for AJ
+                with all love for AJ
               </span>
             </motion.div>
           </motion.div>
