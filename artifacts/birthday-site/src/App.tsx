@@ -190,7 +190,7 @@ function Home() {
                   className="font-script text-5xl md:text-6xl lg:text-7xl"
                   style={{
                     display: 'inline-block',
-                    paddingBottom: '0.22em',
+                    padding: '0.08em 0.32em 0.28em 0.32em',
                     background: 'linear-gradient(90deg, #6B4E8B 0%, #9B7FC8 30%, #CDB8F0 50%, #9B7FC8 70%, #6B4E8B 100%)',
                     backgroundSize: '200% auto',
                     WebkitBackgroundClip: 'text',
@@ -343,21 +343,24 @@ function Home() {
             >
               To Many More,
             </h2>
-            <h2
-              className="text-4xl md:text-6xl lg:text-7xl font-script mb-6"
-              style={{
-                display: 'block',
-                paddingBottom: '0.22em',
-                background: 'linear-gradient(90deg, #6B4E8B, #9B7FC8, #CDB8F0, #9B7FC8, #6B4E8B)',
-                backgroundSize: '200% auto',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-                animation: 'rose-shimmer 5s linear infinite',
-              }}
-            >
-              USR
-            </h2>
+            <div style={{ filter: 'drop-shadow(0 2px 12px rgba(155,127,200,0.45))' }}>
+              <span
+                className="font-script text-4xl md:text-6xl lg:text-7xl"
+                style={{
+                  display: 'inline-block',
+                  padding: '0.08em 0.32em 0.28em 0.32em',
+                  marginBottom: '1.5rem',
+                  background: 'linear-gradient(90deg, #6B4E8B, #9B7FC8, #CDB8F0, #9B7FC8, #6B4E8B)',
+                  backgroundSize: '200% auto',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  animation: 'rose-shimmer 5s linear infinite',
+                }}
+              >
+                USR
+              </span>
+            </div>
 
             <div className="rose-line w-24 mx-auto mb-8" />
 
