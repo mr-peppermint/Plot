@@ -159,7 +159,7 @@ export function IntroLock({ onUnlocked, onMusicReady }: {
     }
   };
 
-  const fadeIn = (audio: HTMLAudioElement, targetVol = 0.35, durationMs = 3000) => {
+  const fadeIn = (audio: HTMLAudioElement, targetVol = 0.20, durationMs = 3000) => {
     clearFade();
     audio.volume = 0;
     const steps    = 80;
@@ -241,7 +241,7 @@ export function IntroLock({ onUnlocked, onMusicReady }: {
       const stepTime = 150 / steps;
       const diff     = (target - audio.volume) / steps;
       fadeTimerRef.current = setInterval(() => {
-        const next = Math.min(Math.max(audio.volume + diff, 0), 0.35);
+        const next = Math.min(Math.max(audio.volume + diff, 0), 0.20);
         audio.volume = next;
         if (next === target || (diff > 0 && next >= target) || (diff < 0 && next <= target)) {
           clearFade();
