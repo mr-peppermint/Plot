@@ -1,13 +1,13 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-/* ── Candle config — ST palette ─────────────────── */
+/* ── Candle config ─────────────────────────────── */
 const CANDLES = [
-  { id: 0, x: 108, color: '#FF4444', shine: '#FF9999' },
-  { id: 1, x: 154, color: '#4488FF', shine: '#99BBFF' },
-  { id: 2, x: 200, color: '#E8A020', shine: '#FFD880' },
-  { id: 3, x: 246, color: '#44CC66', shine: '#99EEB0' },
-  { id: 4, x: 292, color: '#CC44DD', shine: '#EE99FF' },
+  { id: 0, x: 108, color: '#F0A8BE', shine: '#FFE4EE' },
+  { id: 1, x: 154, color: '#C4728A', shine: '#F5B8C8' },
+  { id: 2, x: 200, color: '#C8B0F0', shine: '#EDD8FF' },
+  { id: 3, x: 246, color: '#C4728A', shine: '#F5B8C8' },
+  { id: 4, x: 292, color: '#F0A8BE', shine: '#FFE4EE' },
 ];
 
 const WICK_TOP_Y   = 74;
@@ -37,7 +37,7 @@ function Flame({ seed }: { seed: number }) {
   );
 }
 
-/* ── Smoke puff ────────────────────────────────── */
+/* ── Smoke puff after blow ─────────────────────── */
 function SmokePuff({ cx }: { cx: number }) {
   const puffs = [
     { dx: 0,  sz: 2,   delay: 0    },
@@ -55,7 +55,7 @@ function SmokePuff({ cx }: { cx: number }) {
           cy={WICK_TOP_Y}
           rx={p.sz}
           ry={p.sz * 0.65}
-          fill="rgba(180,200,220,0.6)"
+          fill="rgba(200,175,185,0.65)"
           animate={{ y: -60, opacity: 0, scaleX: 4, scaleY: 3 }}
           transition={{ duration: 1.4, delay: p.delay, ease: 'easeOut' }}
         />
@@ -64,18 +64,17 @@ function SmokePuff({ cx }: { cx: number }) {
   );
 }
 
-/* ── Spark burst — ST colors ───────────────────── */
-function SparkBurst({ cx, candleColor }: { cx: number; candleColor: string }) {
+/* ── Sparkle burst on blow ─────────────────────── */
+function SparkBurst({ cx }: { cx: number }) {
   const SPARKS = [
-    { angle: 0,   r: 30 },
-    { angle: 50,  r: 24 },
-    { angle: 100, r: 32 },
-    { angle: 160, r: 26 },
-    { angle: 220, r: 28 },
-    { angle: 280, r: 22 },
-    { angle: 330, r: 30 },
+    { angle: 0,   r: 30, color: '#FFD6E4' },
+    { angle: 50,  r: 24, color: '#C4728A' },
+    { angle: 100, r: 32, color: '#B89CD8' },
+    { angle: 160, r: 26, color: '#F0A8BE' },
+    { angle: 220, r: 28, color: '#FFD6E4' },
+    { angle: 280, r: 22, color: '#C4728A' },
+    { angle: 330, r: 30, color: '#B89CD8' },
   ];
-  const colors = [candleColor, '#FFD860', '#FFFFFF', candleColor, '#E8A020', '#4FC8F0', candleColor];
   return (
     <>
       {SPARKS.map((s, i) => {
@@ -86,7 +85,7 @@ function SparkBurst({ cx, candleColor }: { cx: number; candleColor: string }) {
             cx={cx}
             cy={WICK_TOP_Y - 10}
             r={3}
-            fill={colors[i % colors.length]}
+            fill={s.color}
             animate={{
               x: s.r * Math.cos(rad),
               y: s.r * Math.sin(rad),
@@ -101,11 +100,11 @@ function SparkBurst({ cx, candleColor }: { cx: number; candleColor: string }) {
   );
 }
 
-/* ── Confetti burst — ST colors ─────────────────── */
+/* ── Confetti burst ─────────────────────────────── */
 function ConfettiBurst() {
   const pieces = Array.from({ length: 40 }, (_, i) => ({
     id: i,
-    color: ['#E8A020','#CC2020','#4FC8F0','#FFD860','#C8A8FF','#44CC66','#FF6030','#FFFFFF'][i % 8],
+    color: ['#F0A8BE','#C4728A','#B89CD8','#F5D0DC','#FFD6E4','#9B7FC8'][i % 6],
     x: 30 + Math.random() * 40,
     vx: (Math.random() - 0.5) * 300,
     vy: -(180 + Math.random() * 220),
@@ -124,43 +123,16 @@ function ConfettiBurst() {
           animate={{ x: p.vx, y: p.vy, opacity: 0, rotate: p.rot }}
           transition={{ duration: 1.6 + p.delay, delay: p.delay, ease: [0.2, 0.8, 0.4, 1] }}
         >
-          {p.shape === 0 && <div style={{ width: 8, height: 8, borderRadius: '50%', background: p.color, boxShadow: `0 0 6px ${p.color}` }} />}
+          {p.shape === 0 && <div style={{ width: 8, height: 8, borderRadius: '50%', background: p.color }} />}
           {p.shape === 1 && <div style={{ width: 12, height: 5, background: p.color }} />}
           {p.shape === 2 && (
-            <svg width="10" height="10" viewBox="0 0 20 20">
-              <path d="M10 0 L11.5 8.5 L20 10 L11.5 11.5 L10 20 L8.5 11.5 L0 10 L8.5 8.5 Z" fill={p.color} />
+            <svg width="10" height="9" viewBox="0 0 20 18">
+              <path d="M10 0 C10 0 0 6 0 11 C0 15 4.5 18 10 18 C15.5 18 20 15 20 11 C20 6 10 0 10 0Z" fill={p.color} />
             </svg>
           )}
         </motion.div>
       ))}
     </div>
-  );
-}
-
-/* ── Fairy lights string in SVG ─────────────────── */
-function SVGFairyLights() {
-  const colors = ['#FF3030','#4FC8F0','#E8A020','#30C040','#C040E0','#FFE030'];
-  const count = 14;
-  const positions = Array.from({ length: count }, (_, i) => 20 + i * 26);
-  return (
-    <g>
-      {/* Wire */}
-      <path
-        d={`M10,10 ` + positions.map((x, i) => `Q${x - 13},16 ${x},10 Q${x + 13},4 ${i < count - 1 ? positions[i + 1] : 380},10`).join(' ')}
-        stroke="rgba(100,80,50,0.5)" strokeWidth="1.3" fill="none"
-      />
-      {positions.map((x, i) => {
-        const color = colors[i % colors.length];
-        return (
-          <g key={i}>
-            <line x1={x} y1={10} x2={x} y2={17} stroke="rgba(80,60,40,0.4)" strokeWidth="1" />
-            <ellipse cx={x} cy={26} rx={5} ry={7} fill={color} opacity={0.9}
-              style={{ filter: `drop-shadow(0 0 6px ${color})` }} />
-            <ellipse cx={x - 1.5} cy={23} rx={1.5} ry={1.2} fill="rgba(255,255,255,0.5)" />
-          </g>
-        );
-      })}
-    </g>
   );
 }
 
@@ -179,14 +151,20 @@ export function IntroLock({ onUnlocked, onMusicReady }: {
   const mutedRef                = useRef(false);
   const fadeTimerRef            = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  /* ── Fade utilities ── */
   const clearFade = () => {
-    if (fadeTimerRef.current) { clearInterval(fadeTimerRef.current); fadeTimerRef.current = null; }
+    if (fadeTimerRef.current) {
+      clearInterval(fadeTimerRef.current);
+      fadeTimerRef.current = null;
+    }
   };
 
   const fadeIn = (audio: HTMLAudioElement, targetVol = 0.5, durationMs = 3000) => {
     clearFade();
     audio.volume = 0;
-    const steps = 80, stepTime = durationMs / steps, stepVol = targetVol / steps;
+    const steps    = 80;
+    const stepTime = durationMs / steps;
+    const stepVol  = targetVol / steps;
     fadeTimerRef.current = setInterval(() => {
       if (!audio) { clearFade(); return; }
       const next = Math.min(audio.volume + stepVol, targetVol);
@@ -197,48 +175,90 @@ export function IntroLock({ onUnlocked, onMusicReady }: {
 
   const fadeOut = (audio: HTMLAudioElement, durationMs = 1800) => {
     clearFade();
-    const startVol = audio.volume, steps = 80, stepTime = durationMs / steps, stepVol = startVol / steps;
+    const startVol = audio.volume;
+    const steps    = 80;
+    const stepTime = durationMs / steps;
+    const stepVol  = startVol / steps;
     fadeTimerRef.current = setInterval(() => {
       if (!audio) { clearFade(); return; }
       const next = Math.max(audio.volume - stepVol, 0);
       audio.volume = next;
-      if (next <= 0) { clearFade(); audio.pause(); }
+      if (next <= 0) {
+        clearFade();
+        audio.pause();
+      }
     }, stepTime);
   };
 
+  /* ── Boot audio ── */
   useEffect(() => {
+    // 🎵 Place your music file at: artifacts/birthday-site/public/music.mp3
     const audio = new Audio(import.meta.env.BASE_URL + 'music.mp3');
-    audio.loop = true; audio.volume = 0;
+    audio.loop   = true;
+    audio.volume = 0;
     audioRef.current = audio;
-    const start = () => { audio.play().then(() => fadeIn(audio, 0.5, 3000)).catch(() => {}); };
+
+    const start = () => {
+      audio.play()
+        .then(() => fadeIn(audio, 0.5, 3000))
+        .catch(() => {
+          // Autoplay blocked on mobile — wait for first tap
+        });
+    };
+
+    // Try immediately (works on desktop)
     start();
-    const onFirstTouch = () => { if (audio.paused) start(); };
+
+    // Retry on first user interaction (required on mobile)
+    const onFirstTouch = () => {
+      if (audio.paused) start();
+    };
     document.addEventListener('pointerdown', onFirstTouch, { once: true });
-    onMusicReady?.(() => { if (audioRef.current) fadeOut(audioRef.current, 1800); });
-    return () => { document.removeEventListener('pointerdown', onFirstTouch); clearFade(); };
+
+    // Give App.tsx a handle to stop the music later from the main page
+    const stopFn = () => {
+      if (audioRef.current) fadeOut(audioRef.current, 1800);
+    };
+    onMusicReady?.(stopFn);
+
+    return () => {
+      document.removeEventListener('pointerdown', onFirstTouch);
+      clearFade();
+      // ✅ Do NOT stop music here — it continues playing on the main page
+    };
   }, []);
 
+  /* ── Mute / unmute ── */
   const toggleMute = useCallback(() => {
     mutedRef.current = !mutedRef.current;
     setMuted(mutedRef.current);
     if (audioRef.current) {
-      const target = mutedRef.current ? 0 : 0.5, audio = audioRef.current;
+      // Smooth volume ramp instead of hard cut
+      const target = mutedRef.current ? 0 : 0.5;
+      const audio  = audioRef.current;
       clearFade();
-      const steps = 20, stepTime = 150 / steps, diff = (target - audio.volume) / steps;
+      const steps    = 20;
+      const stepTime = 150 / steps;
+      const diff     = (target - audio.volume) / steps;
       fadeTimerRef.current = setInterval(() => {
         const next = Math.min(Math.max(audio.volume + diff, 0), 0.5);
         audio.volume = next;
-        if (next === target || (diff > 0 && next >= target) || (diff < 0 && next <= target)) clearFade();
+        if (next === target || (diff > 0 && next >= target) || (diff < 0 && next <= target)) {
+          clearFade();
+        }
       }, stepTime);
     }
   }, []);
 
+  /* ── Blow a candle ── */
   const blowCandle = useCallback((id: number) => {
     if (blown[id] || phase !== 'active') return;
+
     setSmokeIds(p => [...p, id]);
     setSparkIds(p => [...p, id]);
     setTimeout(() => setSmokeIds(p => p.filter(x => x !== id)), 2000);
     setTimeout(() => setSparkIds(p => p.filter(x => x !== id)), 800);
+
     setBlown(prev => {
       const next = [...prev];
       next[id] = true;
@@ -262,23 +282,23 @@ export function IntroLock({ onUnlocked, onMusicReady }: {
           key="cake-intro"
           className="fixed inset-0 z-[9999] flex flex-col items-center justify-center select-none overflow-hidden"
           style={{
-            background: 'radial-gradient(ellipse at 50% 35%, #0A0C20 0%, #05060F 55%, #020308 100%)',
+            background: 'radial-gradient(ellipse at 50% 30%, #220A18 0%, #100508 55%, #050203 100%)',
           }}
           exit={{ opacity: 0 }}
           transition={{ duration: 1.8, ease: [0.4, 0, 0.2, 1] }}
         >
 
-          {/* Mute button — amber/cyan styled */}
+          {/* Mute button */}
           <motion.button
             onClick={toggleMute}
-            className="absolute top-16 right-4 z-20 flex items-center justify-center rounded-full w-9 h-9"
+            className="absolute top-4 right-4 z-20 flex items-center justify-center rounded-full w-9 h-9"
             style={{
-              background: 'rgba(232,160,32,0.12)',
-              border: '1px solid rgba(232,160,32,0.28)',
-              color: 'rgba(255,216,96,0.85)',
+              background: 'rgba(196,114,138,0.15)',
+              border: '1px solid rgba(196,114,138,0.3)',
+              color: 'rgba(240,168,190,0.8)',
               fontSize: 16,
             }}
-            whileHover={{ scale: 1.12, background: 'rgba(232,160,32,0.22)' }}
+            whileHover={{ scale: 1.12, background: 'rgba(196,114,138,0.25)' }}
             whileTap={{ scale: 0.9 }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -288,41 +308,32 @@ export function IntroLock({ onUnlocked, onMusicReady }: {
             {muted ? '🔇' : '🎵'}
           </motion.button>
 
-          {/* Star field — more prominent, white/blue */}
-          {Array.from({ length: 70 }, (_, i) => (
+          {/* Star field */}
+          {Array.from({ length: 55 }, (_, i) => (
             <motion.div key={i}
               className="absolute rounded-full pointer-events-none"
               style={{
-                width: 1 + (i % 3) * 0.7,
-                height: 1 + (i % 3) * 0.7,
+                width: 1 + (i % 3) * 0.8,
+                height: 1 + (i % 3) * 0.8,
                 left: `${(i * 13.7) % 100}%`,
                 top: `${(i * 17.3) % 100}%`,
-                background: [
-                  'rgba(255,255,255,',
-                  'rgba(79,200,240,',
-                  'rgba(232,160,32,',
-                  'rgba(200,180,255,',
-                ][i % 4] + `${0.3 + (i % 4) * 0.15})`,
+                background: ['rgba(240,168,190,','rgba(196,114,138,','rgba(184,156,216,'][i % 3]
+                  + `${0.25 + (i % 4) * 0.12})`,
               }}
-              animate={{ opacity: [0.1, 0.9, 0.1] }}
-              transition={{ duration: 2 + (i % 5), repeat: Infinity, delay: (i * 0.15) % 5 }}
+              animate={{ opacity: [0.1, 0.85, 0.1] }}
+              transition={{ duration: 2 + (i % 4), repeat: Infinity, delay: (i * 0.18) % 5 }}
             />
           ))}
 
-          {/* Floating spore particles */}
-          {[12, 28, 48, 68, 85].map((left, i) => (
+          {/* Floating hearts */}
+          {[15, 35, 65, 82].map((left, i) => (
             <motion.div key={i}
-              className="absolute pointer-events-none"
-              style={{ left: `${left}%`, bottom: '-5%' }}
-              animate={{ y: [0, -(window.innerHeight + 50)], opacity: [0, 0.6, 0.6, 0] }}
-              transition={{ duration: 8 + i * 2, repeat: Infinity, delay: i * 1.5, ease: 'linear' }}
+              className="absolute pointer-events-none text-lg"
+              style={{ left: `${left}%`, top: `${20 + i * 15}%`, opacity: 0.18 }}
+              animate={{ y: [0, -16, 0], opacity: [0.14, 0.28, 0.14] }}
+              transition={{ duration: 3 + i * 0.7, repeat: Infinity, delay: i * 0.5 }}
             >
-              <svg width="8" height="18" viewBox="0 0 10 22" fill="none">
-                <circle cx="5" cy="5" r="4" fill={['#4FC8F0','#E8A020','#C8A8FF','#FFD860','#80EEFF'][i]}
-                  opacity="0.7" style={{ filter: 'blur(0.5px)' }} />
-                <line x1="5" y1="9" x2="5" y2="20" stroke={['#4FC8F0','#E8A020','#C8A8FF','#FFD860','#80EEFF'][i]}
-                  strokeWidth="1" opacity="0.4" />
-              </svg>
+              ♥
             </motion.div>
           ))}
 
@@ -336,7 +347,7 @@ export function IntroLock({ onUnlocked, onMusicReady }: {
           >
             <svg viewBox="0 0 400 440" style={{ width: '100%', height: 'auto', overflow: 'visible' }}>
               <defs>
-                {/* Flame */}
+                {/* Flame gradients */}
                 <linearGradient id="fl_outer" x1="0" y1="1" x2="0" y2="0">
                   <stop offset="0%"   stopColor="#FF5500" />
                   <stop offset="45%"  stopColor="#FF8C00" />
@@ -349,115 +360,130 @@ export function IntroLock({ onUnlocked, onMusicReady }: {
                   <stop offset="100%" stopColor="#FFF4B0" />
                 </linearGradient>
 
-                {/* Bottom tier — deep navy/indigo */}
+                {/* Bottom tier — rich deep rose, lit warmly at top by candles */}
                 <linearGradient id="t1" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%"   stopColor="#1E2A5A" />
-                  <stop offset="30%"  stopColor="#141E48" />
-                  <stop offset="70%"  stopColor="#0C1438" />
-                  <stop offset="100%" stopColor="#080C28" />
+                  <stop offset="0%"   stopColor="#C86882" />
+                  <stop offset="30%"  stopColor="#A85870" />
+                  <stop offset="70%"  stopColor="#883858" />
+                  <stop offset="100%" stopColor="#5E2038" />
                 </linearGradient>
-                {/* Top tier — slightly lighter navy */}
+                {/* Top tier — slightly lighter rose plum */}
                 <linearGradient id="t2" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%"   stopColor="#263070" />
-                  <stop offset="28%"  stopColor="#1C2258" />
-                  <stop offset="68%"  stopColor="#121840" />
-                  <stop offset="100%" stopColor="#0A1030" />
+                  <stop offset="0%"   stopColor="#E090B0" />
+                  <stop offset="28%"  stopColor="#C87095" />
+                  <stop offset="68%"  stopColor="#A04870" />
+                  <stop offset="100%" stopColor="#78304C" />
                 </linearGradient>
-                {/* Left shadow */}
+                {/* Left-side shadow for 3D depth */}
                 <linearGradient id="sideL" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0%"   stopColor="rgba(0,0,0,0.45)" />
+                  <stop offset="0%"   stopColor="rgba(0,0,0,0.38)" />
                   <stop offset="100%" stopColor="rgba(0,0,0,0)" />
                 </linearGradient>
-                {/* Right ambient (amber glow from candles) */}
+                {/* Right-side ambient highlight */}
                 <linearGradient id="sideR" x1="1" y1="0" x2="0" y2="0">
-                  <stop offset="0%"   stopColor="rgba(232,160,32,0.08)" />
-                  <stop offset="100%" stopColor="rgba(232,160,32,0)" />
+                  <stop offset="0%"   stopColor="rgba(255,190,210,0.1)" />
+                  <stop offset="100%" stopColor="rgba(255,190,210,0)" />
                 </linearGradient>
-                {/* Frosting — warm amber-gold */}
+                {/* Frosting — cream white */}
                 <linearGradient id="frost" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%"   stopColor="#FFE08A" />
-                  <stop offset="100%" stopColor="#E8A020" />
+                  <stop offset="0%"   stopColor="#FFFCFA" />
+                  <stop offset="100%" stopColor="#F9D8E4" />
                 </linearGradient>
                 {/* Plate */}
                 <linearGradient id="plate" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%"   stopColor="#1A1E3A" />
-                  <stop offset="100%" stopColor="#0A0C1E" />
+                  <stop offset="0%"   stopColor="#3A1520" />
+                  <stop offset="100%" stopColor="#1A0810" />
                 </linearGradient>
-                {/* Candle light pool */}
+                {/* Candle light pool on tier top surface */}
                 <radialGradient id="candlePool" cx="50%" cy="0%" r="90%" fx="50%" fy="0%">
-                  <stop offset="0%"   stopColor="rgba(255,155,30,0.32)" />
-                  <stop offset="55%"  stopColor="rgba(255,110,10,0.12)" />
+                  <stop offset="0%"   stopColor="rgba(255,155,30,0.28)" />
+                  <stop offset="55%"  stopColor="rgba(255,110,10,0.10)" />
                   <stop offset="100%" stopColor="rgba(255,80,0,0)" />
                 </radialGradient>
 
-                {/* Filters */}
+                {/* Drop shadow for tiers */}
                 <filter id="shadow" x="-20%" y="-20%" width="150%" height="160%">
-                  <feDropShadow dx="0" dy="9" stdDeviation="13" floodColor="rgba(0,0,10,0.7)" />
+                  <feDropShadow dx="0" dy="9" stdDeviation="13" floodColor="rgba(0,0,0,0.65)" />
                 </filter>
+                {/* Candle body shadow */}
                 <filter id="candleShadow">
                   <feDropShadow dx="1" dy="3" stdDeviation="4" floodColor="rgba(0,0,0,0.45)" />
                 </filter>
+                {/* Flame bloom */}
                 <filter id="flameGlow" x="-60%" y="-60%" width="220%" height="220%">
                   <feGaussianBlur stdDeviation="3.5" result="blur" />
                   <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
                 </filter>
+                {/* Soft inner glow for text */}
                 <filter id="textGlow" x="-30%" y="-30%" width="160%" height="160%">
-                  <feGaussianBlur stdDeviation="5" result="blur" />
+                  <feGaussianBlur stdDeviation="4" result="blur" />
                   <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
                 </filter>
               </defs>
 
-              {/* Ground shadow */}
-              <ellipse cx="200" cy="318" rx="192" ry="16" fill="rgba(0,0,0,0.5)" />
+              {/* ── Ground cast shadow ── */}
+              <ellipse cx="200" cy="318" rx="192" ry="16" fill="rgba(0,0,0,0.4)" />
 
-              {/* Plate */}
+              {/* ── Cake Plate ── */}
               <rect x="5"  y="304" width="390" height="14" rx="7" fill="url(#plate)" />
-              <rect x="5"  y="304" width="390" height="3"  rx="3" fill="rgba(100,120,255,0.1)" />
-              <rect x="20" y="310" width="360" height="4"  rx="2" fill="rgba(0,0,0,0.3)" />
+              <rect x="5"  y="304" width="390" height="3"  rx="3" fill="rgba(255,180,200,0.12)" />
+              <rect x="20" y="310" width="360" height="4"  rx="2" fill="rgba(0,0,0,0.25)" />
 
-              {/* ══ BOTTOM TIER ══ */}
+              {/* ══ BOTTOM TIER ══════════════════════════ */}
+              {/* Main body */}
               <rect x="14" y="220" width="372" height="84" rx="15" fill="url(#t1)" filter="url(#shadow)" />
-              <rect x="14" y="220" width="372" height="8"  rx="6"  fill="rgba(79,200,240,0.18)" />
+              {/* Top-edge gloss highlight */}
+              <rect x="14" y="220" width="372" height="8"  rx="6"  fill="rgba(255,205,225,0.30)" />
+              {/* Left-side shadow (3-D depth) */}
               <rect x="14" y="220" width="28"  height="84" rx="5"  fill="url(#sideL)" />
+              {/* Right-side ambient highlight */}
               <rect x="358" y="220" width="28" height="84" rx="5"  fill="url(#sideR)" />
-              <rect x="18" y="295" width="364" height="9"  rx="4"  fill="rgba(0,0,0,0.35)" />
+              {/* Bottom shadow edge */}
+              <rect x="18" y="295" width="364" height="9"  rx="4"  fill="rgba(0,0,0,0.30)" />
 
-              {/* Bottom tier frosting drips — amber/golden */}
+              {/* Bottom tier frosting drips */}
               {[38,72,108,145,182,218,255,292,330,366].map((x, i) => {
                 const h = 10 + [6,12,8,14,6,10,14,8,12,6][i];
                 return (
                   <g key={x}>
                     <rect x={x-9} y={218} width={18} height={h+4} rx={9} fill="url(#frost)" />
                     <ellipse cx={x} cy={218+h+4} rx={9} ry={6.5} fill="url(#frost)" />
-                    <circle  cx={x-2} cy={220} r={2.8} fill="rgba(255,240,180,0.65)" />
+                    <circle  cx={x-2} cy={220} r={2.8} fill="rgba(255,255,255,0.6)" />
                   </g>
                 );
               })}
-              {/* Pearl row — amber */}
+              {/* Bottom pearl row along top edge */}
               {Array.from({ length: 17 }, (_, i) => (
                 <circle key={i} cx={32 + i * 20} cy={222} r={5}
                   fill="url(#frost)"
-                  style={{ filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.35))' }} />
+                  style={{ filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.28))' }} />
               ))}
-              {/* Bottom tier stars/dots */}
+              {/* Bottom tier polka dots */}
               {[55,105,155,200,248,298,348].map((x, i) => (
-                <text key={x} x={x} y={265} textAnchor="middle" fontSize="12"
-                  fill={['rgba(255,200,60,0.6)','rgba(79,200,240,0.6)','rgba(200,140,255,0.6)','rgba(255,200,60,0.6)','rgba(79,200,240,0.6)','rgba(255,100,100,0.6)','rgba(255,200,60,0.6)'][i]}>
-                  ★
-                </text>
+                <circle key={x} cx={x} cy={260} r={4.5}
+                  fill={i%2===0 ? 'rgba(255,210,228,0.70)' : 'rgba(210,182,244,0.70)'} />
               ))}
+              {/* Tier decorative symbols */}
               {[82,182,282,372].map(x => (
-                <text key={x} x={x} y={282} textAnchor="middle" fontSize="10" fill="rgba(79,200,240,0.4)">♦</text>
+                <text key={x} x={x} y={278} textAnchor="middle" fontSize="12" fill="rgba(255,220,232,0.45)">★</text>
+              ))}
+              {[132,232,322].map(x => (
+                <text key={x} x={x} y={277} textAnchor="middle" fontSize="11" fill="rgba(255,200,220,0.55)">♥</text>
               ))}
 
-              {/* ══ TOP TIER ══ */}
+              {/* ══ TOP TIER ══════════════════════════ */}
+              {/* Main body */}
               <rect x="68" y="144" width="264" height="76" rx="12" fill="url(#t2)" filter="url(#shadow)" />
-              <rect x="68" y="144" width="264" height="7"  rx="5"  fill="rgba(100,160,255,0.22)" />
+              {/* Top-edge gloss highlight */}
+              <rect x="68" y="144" width="264" height="7"  rx="5"  fill="rgba(255,220,238,0.32)" />
+              {/* Left-side shadow (3-D depth) */}
               <rect x="68" y="144" width="22"  height="76" rx="4"  fill="url(#sideL)" />
+              {/* Right-side ambient highlight */}
               <rect x="310" y="144" width="22" height="76" rx="4"  fill="url(#sideR)" />
-              <rect x="72"  y="211" width="256" height="9"  rx="4"  fill="rgba(0,0,0,0.3)" />
+              {/* Bottom shadow edge */}
+              <rect x="72"  y="211" width="256" height="9"  rx="4"  fill="rgba(0,0,0,0.26)" />
 
-              {/* Candle light glow pools */}
+              {/* ── Animated candle-light glow pools on top tier surface ── */}
               {CANDLES.map(c => !blown[c.id] && (
                 <motion.ellipse
                   key={`pool-${c.id}`}
@@ -468,10 +494,11 @@ export function IntroLock({ onUnlocked, onMusicReady }: {
                   transition={{ duration: 0.62 + c.id * 0.09, repeat: Infinity, ease: 'easeInOut', delay: c.id * 0.11 }}
                 />
               ))}
+              {/* Combined warm wash across whole top surface when ≥1 candle lit */}
               {blown.filter(Boolean).length < CANDLES.length && (
                 <motion.rect
                   x="68" y="144" width="264" height="24" rx="4"
-                  fill="rgba(255,130,20,0.07)"
+                  fill="rgba(255,130,20,0.08)"
                   initial={{ opacity: 0.5 }}
                   animate={{ opacity: [0.4, 0.9, 0.4] }}
                   transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
@@ -485,7 +512,7 @@ export function IntroLock({ onUnlocked, onMusicReady }: {
                   <g key={x}>
                     <rect x={x-8} y={142} width={16} height={h+3} rx={8} fill="url(#frost)" />
                     <ellipse cx={x} cy={142+h+3} rx={8} ry={5.5} fill="url(#frost)" />
-                    <circle  cx={x-2} cy={143} r={2.2} fill="rgba(255,240,160,0.7)" />
+                    <circle  cx={x-2} cy={143} r={2.2} fill="rgba(255,255,255,0.65)" />
                   </g>
                 );
               })}
@@ -493,140 +520,122 @@ export function IntroLock({ onUnlocked, onMusicReady }: {
               {Array.from({ length: 9 }, (_, i) => (
                 <circle key={i} cx={86 + i * 26} cy={146} r={4.5}
                   fill="url(#frost)"
-                  style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.28))' }} />
+                  style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.22))' }} />
               ))}
-              {/* Top tier dots */}
+              {/* Top tier polka dots */}
               {[104,152,200,248,296].map((x, i) => (
                 <circle key={x} cx={x} cy={183} r={3.5}
-                  fill={['rgba(255,200,60,0.6)','rgba(79,200,240,0.6)','rgba(200,140,255,0.6)','rgba(255,100,100,0.6)','rgba(79,200,240,0.6)'][i]} />
+                  fill={i%2===0 ? 'rgba(255,210,228,0.65)' : 'rgba(200,175,242,0.65)'} />
               ))}
 
-              {/* "Angel" script — warm golden */}
+              {/* "Angel" script on top tier */}
               <text x="200" y="197" textAnchor="middle"
-                fontFamily="'Sacramento', cursive" fontSize="40"
-                fill="rgba(255,220,100,0.9)"
+                fontFamily="'Sacramento', cursive" fontSize="38"
+                fill="rgba(255,234,244,0.78)"
                 filter="url(#textGlow)"
                 style={{ userSelect: 'none' }}>
                 Angel
               </text>
 
-              {/* Fairy lights string across cake top */}
-              <g transform="translate(68, 108)">
-                <SVGFairyLights />
-              </g>
-
-              {/* ══ CANDLES ══ */}
+              {/* ══ CANDLES ══════════════════════════ */}
               {CANDLES.map(c => {
                 const isBlown = blown[c.id];
                 return (
                   <g key={c.id} onClick={() => blowCandle(c.id)}
                     style={{ cursor: isBlown ? 'default' : 'pointer' }}>
+                    {/* Wide tap target */}
                     <rect x={c.x-26} y={20} width={52} height={130} fill="transparent" />
-
                     {/* Candle body */}
-                    <rect x={c.x-7} y={CANDLE_TOP_Y} width={14} height={CANDLE_BTM_Y - CANDLE_TOP_Y}
-                      rx={4} fill={c.color} filter="url(#candleShadow)" />
-                    {/* Candle shine */}
-                    <rect x={c.x-4} y={CANDLE_TOP_Y + 4} width={4} height={CANDLE_BTM_Y - CANDLE_TOP_Y - 8}
-                      rx={2} fill={c.shine} opacity={0.4} />
-                    {/* Candle warm glow if lit */}
-                    {!isBlown && (
-                      <motion.rect
-                        x={c.x - 10} y={CANDLE_TOP_Y} width={20} height={20} rx={4}
-                        fill={c.color} opacity={0}
-                        animate={{ opacity: [0.0, 0.18, 0.0] }}
-                        transition={{ duration: 0.55 + c.id * 0.08, repeat: Infinity, ease: 'easeInOut' }}
-                      />
-                    )}
+                    <rect x={c.x-8} y={CANDLE_TOP_Y} width={16}
+                      height={CANDLE_BTM_Y - CANDLE_TOP_Y}
+                      rx={5} fill={c.color} filter="url(#candleShadow)" />
+                    {/* Highlight stripe */}
+                    <rect x={c.x-5} y={CANDLE_TOP_Y+5} width={3.5}
+                      height={CANDLE_BTM_Y - CANDLE_TOP_Y - 14} rx={1.75}
+                      fill="rgba(255,255,255,0.28)" />
+                    {/* Base shine */}
+                    <ellipse cx={c.x} cy={CANDLE_BTM_Y} rx={9} ry={3.5}
+                      fill={c.shine} opacity={0.38} />
                     {/* Wick */}
-                    <line x1={c.x} y1={WICK_TOP_Y} x2={c.x} y2={CANDLE_TOP_Y}
-                      stroke="#3A2010" strokeWidth={1.5} />
-
+                    <line x1={c.x} y1={CANDLE_TOP_Y} x2={c.x} y2={WICK_TOP_Y}
+                      stroke="#3A1825" strokeWidth={2.2} strokeLinecap="round" />
+                    {/* Ember / char */}
+                    <circle cx={c.x} cy={WICK_TOP_Y} r={2.5}
+                      fill={isBlown ? '#3A1825' : '#FF6000'}
+                      style={{ filter: isBlown ? 'none' : 'drop-shadow(0 0 5px rgba(255,140,0,1))' }} />
+                    {/* Warm halo on candle body when burning */}
+                    {!isBlown && (
+                      <motion.ellipse cx={c.x} cy={CANDLE_TOP_Y + 8} rx={9} ry={6}
+                        animate={{ opacity: [0.18, 0.38, 0.18] }}
+                        transition={{ duration: 0.55 + c.id * 0.07, repeat: Infinity }}
+                        fill="rgba(255,160,40,0.35)" />
+                    )}
                     {/* Flame */}
                     {!isBlown && (
                       <g transform={`translate(${c.x}, ${WICK_TOP_Y})`} filter="url(#flameGlow)">
                         <Flame seed={c.id} />
                       </g>
                     )}
-
-                    {/* Smoke */}
                     {smokeIds.includes(c.id) && <SmokePuff cx={c.x} />}
-                    {/* Sparks */}
-                    {sparkIds.includes(c.id) && <SparkBurst cx={c.x} candleColor={c.color} />}
+                    {sparkIds.includes(c.id) && <SparkBurst cx={c.x} />}
+                    {isBlown && (
+                      <motion.circle cx={c.x} cy={WICK_TOP_Y} r={7}
+                        fill="none" stroke="rgba(196,114,138,0.3)" strokeWidth={1}
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1.2, opacity: 0 }}
+                        transition={{ duration: 0.5 }} />
+                    )}
                   </g>
                 );
               })}
 
-              {/* "Happy 18th!" text — amber/warm gold below cake */}
-              <motion.text
-                x="200" y="360"
-                textAnchor="middle"
-                fontFamily="'Sacramento', cursive"
-                fontSize="44"
-                fill="url(#frost)"
-                filter="url(#textGlow)"
-                style={{ userSelect: 'none' }}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8, duration: 0.8 }}
-              >
+              {/* ── Texts below cake ── */}
+              <text x="200" y="362" textAnchor="middle"
+                fontFamily="'Sacramento', cursive" fontSize="36"
+                fill="rgba(240,168,190,0.75)"
+                style={{ userSelect: 'none' }}>
                 Happy 18th!
-              </motion.text>
-
-              <motion.text
-                x="200" y="395"
-                textAnchor="middle"
-                fontFamily="'Inter', sans-serif"
-                fontSize="13"
-                fill="rgba(200,200,255,0.55)"
-                style={{ userSelect: 'none' }}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 1.2, duration: 0.8 }}
-              >
+              </text>
+              <text x="200" y="400" textAnchor="middle"
+                fontFamily="'Inter', sans-serif" fontSize="12.5"
+                fill="rgba(196,114,138,0.52)"
+                style={{ userSelect: 'none' }}>
                 How Did You Think I Would Forget?
-              </motion.text>
-
-              {/* Click hint dots */}
-              {phase === 'active' && (
-                <motion.text
-                  x="200" y="426"
-                  textAnchor="middle"
-                  fontFamily="'Inter', sans-serif"
-                  fontSize="11"
-                  fill="rgba(232,160,32,0.45)"
-                  style={{ userSelect: 'none' }}
-                  animate={{ opacity: [0.3, 0.8, 0.3] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                >
-                  click each candle to blow it out ✦ {blownCount}/{CANDLES.length}
-                </motion.text>
-              )}
+              </text>
+              {/* Decorative hearts */}
+              {[-28,-10,10,28].map((dx, i) => (
+                <text key={i} x={200+dx} y={428} textAnchor="middle" fontSize="9"
+                  fill={`rgba(196,114,138,${i===1||i===2 ? 0.55 : 0.28})`}
+                  style={{ userSelect: 'none' }}>♥</text>
+              ))}
             </svg>
-
-            {/* All-blown celebration message */}
-            <AnimatePresence>
-              {phase === 'allBlown' && (
-                <motion.div
-                  className="absolute inset-0 flex items-center justify-center pointer-events-none"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ type: 'spring', stiffness: 200 }}
-                  style={{ top: '-10%' }}
-                >
-                  <div className="text-center" style={{ filter: 'drop-shadow(0 0 20px rgba(232,160,32,0.7))' }}>
-                    <div className="font-serif italic text-4xl md:text-5xl" style={{ color: '#FFD860' }}>
-                      Make a Wish! ✦
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
           </motion.div>
 
-          {/* Confetti on all blown */}
-          {phase === 'allBlown' && <ConfettiBurst />}
+          <AnimatePresence>
+            {phase === 'allBlown' && <ConfettiBurst />}
+          </AnimatePresence>
+
+          {blownCount === 0 && (
+            <motion.div
+              className="absolute bottom-10 z-10 flex flex-col items-center gap-2"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.2 }}
+            >
+              <motion.div
+                animate={{ y: [0, -5, 0] }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+                style={{ color: 'rgba(196,114,138,0.5)', fontSize: 20 }}
+              >
+                ↑
+              </motion.div>
+              <p className="font-sans text-[10px] tracking-[0.3em] uppercase"
+                style={{ color: 'rgba(196,114,138,0.4)' }}>
+                tap the flames
+              </p>
+            </motion.div>
+          )}
+
         </motion.div>
       )}
     </AnimatePresence>
