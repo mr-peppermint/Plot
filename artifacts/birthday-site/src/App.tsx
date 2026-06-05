@@ -9,6 +9,7 @@ import { AnimatedBackground } from "./components/AnimatedBackground";
 import { TimelineSector } from "./components/TimelineSector";
 import { FloatingBalloons, ConfettiBurst, Sparkles } from "./components/Sparkles";
 import { IntroLock } from "./components/IntroLock";
+import { WishNote } from "./components/WishNote";
 
 const queryClient = new QueryClient();
 
@@ -426,6 +427,7 @@ function Home() {
           </motion.div>
         </section>
       </main>
+      <WishNote />
     </div>
   );
 }
