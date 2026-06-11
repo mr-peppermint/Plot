@@ -14,7 +14,7 @@ import { WishNote } from "./components/WishNote";
 const queryClient = new QueryClient();
 
 const CHAPTERS: { label: string; title: string; description: string; image?: string }[] = [
-  { label: "Memory", title: "From the Very Start", description: "From the moment you arrived, the world became a brighter, softer place. You were magic from day one, USR." },
+  { label: "Memory", title: "From the Very Start", description: "From the moment you arrived, the world became a brighter, softer place. You were magic from day one, USR.", image: "/chapter1.jpg" },
   { label: "Memory", title: "First Smile", description: "That smile of yours — the one that lights up every room — made its debut and nobody has been the same since." },
   { label: "Memory", title: "Growing So Gracefully", description: "Every step you took, every word you spoke — full of the grace and light that only AJ could carry." },
   { label: "Memory", title: "Shared Giggles", description: "Laughing until it hurt. The kind of joy that stays with you long after the moment fades." },
