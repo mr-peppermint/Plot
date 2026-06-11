@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
 interface SparklesProps {
   count?: number;
@@ -11,7 +11,7 @@ export function Sparkles({
   colors = ['#F0A8BE', '#C4728A', '#CDB8F0', '#F5D0DC', '#B89CD8'],
   className = '',
 }: SparklesProps) {
-  const sparkles = Array.from({ length: count }, (_, i) => ({
+  const sparkles = useMemo(() => Array.from({ length: count }, (_, i) => ({
     id: i,
     top: `${Math.random() * 100}%`,
     left: `${Math.random() * 100}%`,
@@ -19,7 +19,7 @@ export function Sparkles({
     delay: Math.random() * 4,
     duration: Math.random() * 2.5 + 1.5,
     color: colors[Math.floor(Math.random() * colors.length)],
-  }));
+  })), [count]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className={`absolute inset-0 pointer-events-none overflow-hidden ${className}`}>
@@ -48,7 +48,7 @@ export function Sparkles({
 }
 
 export function FloatingBalloons({ count = 5 }: { count?: number }) {
-  const balloons = Array.from({ length: count }, (_, i) => ({
+  const balloons = useMemo(() => Array.from({ length: count }, (_, i) => ({
     id: i,
     left: `${8 + (i / count) * 84}%`,
     color: ['#D4728A', '#B89CD8', '#E8A0B8', '#9B7FC8', '#F0A8BE'][i % 5],
@@ -56,7 +56,7 @@ export function FloatingBalloons({ count = 5 }: { count?: number }) {
     size: 28 + Math.random() * 18,
     delay: i * 0.5,
     duration: 5 + Math.random() * 3,
-  }));
+  })), [count]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden">

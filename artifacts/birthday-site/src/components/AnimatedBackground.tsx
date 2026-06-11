@@ -120,7 +120,7 @@ export function AnimatedBackground() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
       shapes = [];
-      const count = Math.min(Math.floor(window.innerWidth / 10), 140);
+      const count = Math.min(Math.floor(window.innerWidth / 18), 70);
       for (let i = 0; i < count; i++) shapes.push(makeShape());
     };
 
