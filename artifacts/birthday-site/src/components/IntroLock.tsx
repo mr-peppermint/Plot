@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { audioStore } from '../lib/audioStore';
 
 /* ── Candle config ─────────────────────────────── */
 const CANDLES = [
@@ -159,7 +160,7 @@ export function IntroLock({ onUnlocked, onMusicReady }: {
     }
   };
 
-  const fadeIn = (audio: HTMLAudioElement, targetVol = 0.20, durationMs = 3000) => {
+  const fadeIn = (audio: HTMLAudioElement, targetVol = 0.40, durationMs = 3000) => {
     clearFade();
     audio.volume = 0;
     const steps    = 80;
@@ -197,10 +198,11 @@ export function IntroLock({ onUnlocked, onMusicReady }: {
     audio.loop   = true;
     audio.volume = 0;
     audioRef.current = audio;
+    audioStore.set(audio);
 
     const start = () => {
       audio.play()
-        .then(() => fadeIn(audio, 0.5, 3000))
+        .then(() => fadeIn(audio, 0.40, 3000))
         .catch(() => {
           // Autoplay blocked on mobile — wait for first tap
         });
@@ -234,14 +236,14 @@ export function IntroLock({ onUnlocked, onMusicReady }: {
     setMuted(mutedRef.current);
     if (audioRef.current) {
       // Smooth volume ramp instead of hard cut
-      const target = mutedRef.current ? 0 : 0.5;
+      const target = mutedRef.current ? 0 : 0.40;
       const audio  = audioRef.current;
       clearFade();
       const steps    = 20;
       const stepTime = 150 / steps;
       const diff     = (target - audio.volume) / steps;
       fadeTimerRef.current = setInterval(() => {
-        const next = Math.min(Math.max(audio.volume + diff, 0), 0.20);
+        const next = Math.min(Math.max(audio.volume + diff, 0), 0.40);
         audio.volume = next;
         if (next === target || (diff > 0 && next >= target) || (diff < 0 && next <= target)) {
           clearFade();

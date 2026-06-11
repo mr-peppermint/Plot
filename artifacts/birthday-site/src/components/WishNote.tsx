@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Inbox, X, BookOpen, Check } from "lucide-react";
+import { audioStore } from "../lib/audioStore";
 
 const BASE = import.meta.env.BASE_URL ?? "/";
 
@@ -462,6 +463,18 @@ export function WishNote() {
                           className="w-full block"
                           style={{ background: "#2A1A08", maxHeight: 280 }}
                           src={`${BASE}wish-video.mp4`}
+                          onPlay={() => {
+                            const a = audioStore.get();
+                            if (a && !a.paused) a.pause();
+                          }}
+                          onPause={() => {
+                            const a = audioStore.get();
+                            if (a && a.paused) a.play().catch(() => {});
+                          }}
+                          onEnded={() => {
+                            const a = audioStore.get();
+                            if (a && a.paused) a.play().catch(() => {});
+                          }}
                           onError={(e) => {
                             (e.currentTarget as HTMLVideoElement).style.display = "none";
                             const sib = e.currentTarget.nextElementSibling as HTMLElement | null;
