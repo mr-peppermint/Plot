@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Image as ImageIcon, X, ZoomIn } from 'lucide-react';
 import { Sparkles } from './Sparkles';
@@ -29,13 +30,18 @@ function CornerBracket({ position }: { position: 'tl' | 'tr' | 'bl' | 'br' }) {
 }
 
 function Lightbox({ src, onClose }: { src: string; onClose: () => void }) {
-  return (
+  return createPortal(
     <AnimatePresence>
       {/* Backdrop */}
       <motion.div
         key="lb-backdrop"
-        className="fixed inset-0 z-[200] flex items-center justify-center"
-        style={{ backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)', background: 'rgba(6,2,12,0.88)' }}
+        className="fixed inset-0 flex items-center justify-center"
+        style={{
+          zIndex: 9999,
+          backdropFilter: 'blur(18px)',
+          WebkitBackdropFilter: 'blur(18px)',
+          background: 'rgba(6,2,12,0.88)',
+        }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -44,7 +50,7 @@ function Lightbox({ src, onClose }: { src: string; onClose: () => void }) {
       >
         {/* Close button */}
         <motion.button
-          className="absolute top-5 right-5 z-10 rounded-full p-2 flex items-center justify-center"
+          className="absolute top-5 right-5 rounded-full p-2 flex items-center justify-center"
           style={{
             background: 'rgba(255,255,255,0.1)',
             border: '1px solid rgba(255,255,255,0.18)',
@@ -78,7 +84,8 @@ function Lightbox({ src, onClose }: { src: string; onClose: () => void }) {
           onClick={(e) => e.stopPropagation()}
         />
       </motion.div>
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   );
 }
 
