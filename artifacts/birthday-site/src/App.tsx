@@ -14,9 +14,9 @@ import { WishNote } from "./components/WishNote";
 const queryClient = new QueryClient();
 
 const CHAPTERS: { label: string; title: string; description: string; image?: string }[] = [
-  { label: "Memory", title: "From the Very Start", description: "From the moment you arrived, the world became a brighter, softer place. You were magic from day one, USR." },
-  { label: "Memory", title: "First Smile", description: "That smile of yours — the one that lights up every room — made its debut and nobody has been the same since." },
-  { label: "Memory", title: "Growing So Gracefully", description: "Every step you took, every word you spoke — full of the grace and light that only AJ could carry." },
+  { label: "Memory", title: "From the Very Start", description: "From the moment you arrived, the world became a brighter, softer place. You were magic from day one, USR.", image: "https://picsum.photos/seed/aj1/800/600" },
+  { label: "Memory", title: "First Smile", description: "That smile of yours — the one that lights up every room — made its debut and nobody has been the same since.", image: "https://picsum.photos/seed/aj2/800/600" },
+  { label: "Memory", title: "Growing So Gracefully", description: "Every step you took, every word you spoke — full of the grace and light that only AJ could carry.", image: "https://picsum.photos/seed/aj3/800/600" },
   { label: "Memory", title: "Shared Giggles", description: "Laughing until it hurt. The kind of joy that stays with you long after the moment fades." },
   { label: "Memory", title: "Unexpected Sparkle", description: "You have this way of finding magic in ordinary moments. Only USR could see the world quite like that." },
   { label: "Memory", title: "Finding Her Wings", description: "Brave, bold, and beautifully herself — AJ spreading her wings and owning every moment." },
